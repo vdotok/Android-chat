@@ -3,7 +3,7 @@ vdotok-Android-chat
 Readme
 
 Installation
-======================
+============
 
 Requirements
 * Android Studio 4.1.2 or later
