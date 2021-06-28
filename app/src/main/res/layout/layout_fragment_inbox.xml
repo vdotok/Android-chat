@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data></data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:clickable="true"
+        android:focusable="true">
+
+        <include
+            android:id="@+id/custom_toolbar"
+            layout="@layout/custom_toolbar_all_users" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="150dp"
+            android:src="@drawable/ic_on_boarding"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/custom_toolbar" />
+
+        <TextView
+            android:id="@+id/tv_no_conversation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="63dp"
+            android:fontFamily="@font/inter_regular_400"
+            android:text="@string/no_conversation_yet"
+            android:textColor="@color/tile_green_dark"
+            android:textSize="21sp"
+            app:layout_constraintEnd_toEndOf="@+id/imageView"
+            app:layout_constraintStart_toStartOf="@+id/imageView"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/inter_regular_400"
+            android:gravity="center"
+            android:text="@string/no_conversation_detail"
+            android:textColor="@color/dark_indigo_12"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_no_conversation"
+            app:layout_constraintStart_toStartOf="@+id/tv_no_conversation"
+            app:layout_constraintTop_toBottomOf="@+id/tv_no_conversation" />
+
+        <Button
+            android:id="@+id/btn_new_chat"
+            android:layout_width="196dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/bg_button_purple_stroke"
+            android:fontFamily="@font/manrope_bold_700"
+            android:text="@string/new_chat"
+            android:textAllCaps="true"
+            android:textColor="@color/indigo"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_no_conversation"
+            app:layout_constraintStart_toStartOf="@+id/tv_no_conversation"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+        <Button
+            android:id="@+id/btn_refresh"
+            android:layout_width="196dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/roundbutton"
+            android:backgroundTint="@color/indigo"
+            android:fontFamily="@font/manrope_bold_700"
+            android:text="@string/refresh"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_no_conversation"
+            app:layout_constraintStart_toStartOf="@+id/tv_no_conversation"
+            app:layout_constraintTop_toBottomOf="@+id/btn_new_chat" />
+
+        <TextView
+            android:id="@+id/tv_logout"
+            style="@style/Theme_Button_DeActivated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="60dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:padding="10dp"
+            android:stateListAnimator="@null"
+            android:text="@string/log_out"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrierGroup" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/tv_logout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_logout">
+
+            <TextView
+                android:id="@+id/tv_username"
+                style="@style/Theme_Button_DeActivated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginEnd="10dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:stateListAnimator="@null"
+                android:text="venum"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/tv_led"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_gravity="end|top"
+                android:src="@drawable/led_error" />
+
+        </FrameLayout>
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/tv_logout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/custom_toolbar">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvUserList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="24dp"
+                android:orientation="vertical"
+                android:paddingStart="10dp"
+                android:paddingTop="15dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="40dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupChatListing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="imageView, tv_no_conversation, textView, btn_new_chat, btn_refresh" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrierGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="btn_refresh,swipeRefreshLay" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="10dp"
+            android:indeterminateTint="@color/black"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

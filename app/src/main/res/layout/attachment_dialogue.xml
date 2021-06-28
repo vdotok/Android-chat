@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="1dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_centerInParent="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:minWidth="250dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_group_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:text="@string/add_group_title"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:textStyle="bold"
+                    android:textColor="@color/grayish_3"
+                    android:layout_marginStart="24dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/img_close"
+                    app:layout_constraintEnd_toStartOf="@+id/img_close"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/img_close" />
+
+                <ImageView
+                    android:id="@+id/img_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_close"
+                    android:layout_marginTop="36dp"
+                    android:layout_marginEnd="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/img_file"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:src="@drawable/ic_attachment_file"
+                    android:layout_marginTop="30dp"
+                    app:layout_constraintStart_toStartOf="@+id/tv_group_name"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_group_name" />
+
+                <ImageView
+                    android:id="@+id/img_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_attachment_camera"
+                    app:layout_constraintEnd_toStartOf="@id/img_album"
+                    app:layout_constraintStart_toEndOf="@+id/img_file"
+                    app:layout_constraintTop_toTopOf="@+id/img_file" />
+
+                <ImageView
+                    android:id="@+id/img_album"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_attachment_album"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/img_camera"
+                    app:layout_constraintTop_toTopOf="@+id/img_file"  />
+
+                <ImageView
+                    android:id="@+id/img_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_attachment_audio"
+                    android:layout_marginTop="20dp"
+                    android:paddingBottom="30dp"
+                    app:layout_constraintStart_toStartOf="@id/img_file"
+                    app:layout_constraintTop_toBottomOf="@+id/img_file" />
+
+                <ImageView
+                    android:id="@+id/img_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_attachment_location"
+                    app:layout_constraintEnd_toStartOf="@id/img_contact"
+                    app:layout_constraintStart_toEndOf="@+id/img_audio"
+                    app:layout_constraintTop_toTopOf="@+id/img_audio" />
+
+                <ImageView
+                    android:id="@+id/img_contact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_attachment_contact"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/img_camera"
+                    app:layout_constraintTop_toTopOf="@+id/img_audio"  />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </RelativeLayout>
+
+
+</layout>

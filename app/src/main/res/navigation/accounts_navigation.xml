@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/accounts_navigation"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.norgic.vdotokchat.ui.account.fragment.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/layout_fragment_login">
+
+        <action
+            android:id="@+id/action_move_to_signup_user"
+            app:destination="@id/signUpFragment"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
+            app:popUpToInclusive="true"
+            app:launchSingleTop="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.norgic.vdotokchat.ui.account.fragment.SignUpFragment"
+        android:label="SignUpFragment"
+        tools:layout="@layout/layout_fragment_signup">
+
+        <action
+            android:id="@+id/action_move_to_login_user"
+            app:destination="@id/loginFragment"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"
+            app:launchSingleTop="true" />
+    </fragment>
+
+
+</navigation>
