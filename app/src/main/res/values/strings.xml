@@ -65,6 +65,7 @@
     <string name="blank" />
 
     <string name="in_progress">In progress!</string>
+    <string name="attachment_failed">Attachment received failed</string>
     <string name="sdk_connected">SDK Connected!</string>
 
     <!--    image descriptions-->

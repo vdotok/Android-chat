@@ -18,15 +18,17 @@ import com.norgic.vdotokchat.prefs.Prefs
 import com.norgic.vdotokchat.ui.account.ui.AccountActivity.Companion.createAccountsActivity
 import com.norgic.vdotokchat.ui.dashBoard.ui.DashboardActivity.Companion.createDashboardActivity
 import com.norgic.vdotokchat.utils.ApplicationConstants.HTTP_CODE_NO_NETWORK
-import com.norgic.vdotokchat.utils.ApplicationConstants.AUTH_TOKEN
-import com.norgic.vdotokchat.utils.ApplicationConstants.PROJECT_ID
+import com.norgic.vdotokchat.utils.ApplicationConstants.SDK_API_KEY
+import com.norgic.vdotokchat.utils.ApplicationConstants.SDK_TENANT_ID
 import com.norgic.vdotokchat.utils.safeApiCall
 import com.norgic.vdotokchat.network.Result
+import com.norgic.vdotokchat.utils.saveResponseToPrefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import retrofit2.Response
 
 class SplashActivity : AppCompatActivity() {
 
@@ -55,8 +57,8 @@ class SplashActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             val response = safeApiCall { service.authSDK (
                     AuthenticationRequest(
-                            AUTH_TOKEN,
-                            PROJECT_ID)
+                            SDK_API_KEY,
+                            SDK_TENANT_ID)
             ) }
 
             withContext(Dispatchers.Main) {

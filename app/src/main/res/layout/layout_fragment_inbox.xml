@@ -2,7 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data></data>
+    <data>
+        <variable
+            name="isSocketConnected"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -101,6 +105,7 @@
             app:layout_constraintTop_toBottomOf="@id/barrierGroup" />
 
         <FrameLayout
+            android:id="@+id/frame"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="@id/tv_logout"
@@ -121,14 +126,18 @@
                 android:text="venum"
                 android:textSize="12sp" />
 
-            <ImageView
-                android:id="@+id/tv_led"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_gravity="end|top"
-                android:src="@drawable/led_error" />
-
         </FrameLayout>
+
+        <View
+            android:id="@+id/tv_led"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/round_shape"
+            android:backgroundTint="@{isSocketConnected ? @color/teal_200 : @color/red}"
+            app:layout_constraintStart_toEndOf="@+id/frame"
+            app:layout_constraintTop_toTopOf="@+id/frame"
+            app:layout_constraintBottom_toBottomOf="@+id/frame"
+            />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefreshLay"

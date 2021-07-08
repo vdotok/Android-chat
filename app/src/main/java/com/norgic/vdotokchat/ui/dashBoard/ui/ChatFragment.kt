@@ -36,12 +36,14 @@ import com.norgic.vdotokchat.ui.dashBoard.adapter.ChatListAdapter
 import com.norgic.vdotokchat.ui.dashBoard.adapter.OnMediaItemClickCallbackListner
 import com.norgic.vdotokchat.ui.fragments.ChatMangerListenerFragment
 import com.norgic.vdotokchat.utils.*
+import com.norgic.vdotokchat.utils.ApplicationConstants.REQUEST_CODE_GALLERY
 import com.norgic.vdotokchat.utils.ConnectivityStatus.Companion.isConnected
 import com.norgic.vdotokchat.utils.ImageUtils.calculateInSampleSize
 import com.norgic.vdotokchat.utils.ImageUtils.copyFileToInternalStorage
 import com.norgic.vdotokchat.utils.ImageUtils.encodeToBase64
 import java.io.*
 import java.nio.file.Files
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.timerTask
@@ -102,7 +104,9 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
             adapter = ChatListAdapter(it, this, loginUserRefId, getSaveChat(), this, {}){
                 sendAcknowledgeMsgToGroup(it)
             }
+            adapter.setHasStableIds(true)
             binding.rcvMsgList.adapter = adapter
+            scrollToLast()
         }
     }
 
@@ -196,7 +200,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     private fun getMessageCheck(msg: ObservableField<String>): Boolean {
-        if (msg.get().toString().isEmpty()) {
+        if (msg.get().toString().trim().isEmpty()) {
             binding.chatInputLayout.imgSend.isEnabled = false
             binding.chatInputLayout.imgSend.setColorFilter(
                 ContextCompat.getColor(
@@ -258,7 +262,8 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
      * Function to scroll recyclerview to last index
      * */
     private fun scrollToLast() {
-        binding.rcvMsgList.scrollToPosition(adapter.itemCount.minus(1))
+        if (adapter.itemCount > 0)
+            binding.rcvMsgList.smoothScrollToPosition(adapter.itemCount.minus(1))
     }
 
 
@@ -291,7 +296,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
 
-    private fun SaveImage(
+    private fun saveFileToStorage(
         bytes: ByteArray,
         displayName: String,
         mimeType: String,
@@ -307,11 +312,8 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
 
         val imageurl = resol?.insert(contentUri, contentValu)
 
-        val parcelFileDescriptor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        val parcelFileDescriptor =
             activity?.applicationContext?.contentResolver?.openFileDescriptor(imageurl!!, "w", null)
-        } else {
-            TODO("VERSION.SDK_INT < KITKAT")
-        }
 
         val fileOutputStream = FileOutputStream(parcelFileDescriptor!!.fileDescriptor)
         fileOutputStream.write(bytes)
@@ -393,145 +395,35 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
 
-
+    var selectedFile: File? = null
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        var filePath: File? = null
 
-        if (resultCode == Activity.RESULT_OK && requestCode == ApplicationConstants.REQUEST_CODE_GALLERY) {
+        if(resultCode == Activity.RESULT_OK){
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                activity?.applicationContext?.let { context->
-                    val byteArray = ImageUtils.convertImageToByte(
-                        context,
-                        Uri.parse(data?.data.toString())
-                    )
-
-                    SaveImage(
-                        byteArray!!,
-                        "${System.currentTimeMillis()}",
-                        "image/jpeg",
-                        "${Environment.DIRECTORY_PICTURES}/$directoryName",
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                    )
+            when (requestCode) {
+                REQUEST_CODE_GALLERY -> {
+                    handleSelectionFromGallery(data)
                 }
-            } else {
-
-                file = getFileData(activity as Context, data?.data, MediaType.IMAGE)
-
+                REQUEST_CODE_VIDEO -> {
+                    handleSelectionFromVideos(data)
+                }
+                REQUEST_CODE_AUDIO -> {
+                    handleSelectionFromAudio(data)
+                }
+                CAMERA -> {
+                    handleSelectionFromCamera(data)
+                }
+                REQUEST_CODE_DOC -> {
+                    handleSelectionFromDocuments(data)
+                }
             }
 
-            filePath = file
-            fileType = 0
-        }
-        else if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_VIDEO) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                activity?.applicationContext?.let { context ->
-                    data?.data?.let { data ->
-                         VideoPath = ImageUtils.copyFileToInternalStorage(context, data, "video")
-                        val VideoBytes = converFileToByteArray(VideoPath)
-                        SaveImage(
-                            VideoBytes!!,
-                            "${System.currentTimeMillis()}",
-                            "video/mp4",
-                            "${Environment.DIRECTORY_MOVIES}/$directoryName",
-                            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-                        )
-                    }
-
-                }
-            } else {
-                file = getFileData(activity as Context, data?.data, MediaType.VIDEO)
-            }
-            filePath = file
-            fileType = 2
-        }
-        else if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_AUDIO) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                activity?.applicationContext?.let { context ->
-                    data?.data?.let { data ->
-                        val AudioPath = copyFileToInternalStorage(context, data, "audio")
-                        val AudioBytes = converFileToByteArray(AudioPath)
-                        SaveImage(
-                            AudioBytes!!,
-                            "${System.currentTimeMillis()}",
-                            "audio/x-wav",
-                            "${Environment.DIRECTORY_MUSIC}/$directoryName",
-                            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                        )
-                    }
-                }
-            } else {
-                file = getFileData(activity as Context, data?.data, MediaType.AUDIO)
-
-            }
-            filePath = file
-            fileType = 1
-        }
-        else if (resultCode == Activity.RESULT_OK && requestCode == CAMERA) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                activity?.applicationContext?.let { context->
-                    val byteArray = ImageUtils.convertBitmapToByteArray(
-                        data?.extras?.get("data") as Bitmap
-                    )
-
-                    SaveImage(
-                        byteArray!!,
-                        "${System.currentTimeMillis()}",
-                        "image/jpeg",
-                        "${Environment.DIRECTORY_PICTURES}/$directoryName",
-                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                    )
-                }
-            } else {
-
-
-                file = getFileData(
-                    activity as Context, getImageUri(
-                        activity?.applicationContext!!, data?.extras?.get(
-                            "data"
-                        ) as Bitmap
-                    ), MediaType.IMAGE
-                )
-
+            groupModel?.let {
+                cManger?.sendFileToGroup(it.channelKey, it.channelName, selectedFile, fileType)
             }
 
-            filePath = file
-            fileType = 0
-        }
-        else if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_DOC) {
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                data?.data?.let { uriData ->
-                activity?.let { context ->
-                    val filePath = copyFileToInternalStorage(context, uriData, "document")
-                    val FileBytes = converFileToByteArray(filePath)
-                      SaveImage(
-                          FileBytes!!,
-                          "${System.currentTimeMillis()}",
-                          "application/pdf",
-                          "${Environment.DIRECTORY_DOCUMENTS}/$directoryName",
-                          MediaStore.Files.getContentUri("external")
-                      )
-                }
-                }
-            } else {
-                file = getFileData(activity as Context, data?.data, MediaType.FILE)
-            }
-            filePath  = file
-            fileType = 3
-        }
-        filePath?.let {
-            if(filePath.length() > ApplicationConstants.FILE_SIZE_LIMIT){
-                binding.root.showSnackBar(R.string.file_size)
-            } else {
-                val byteArray = Files.readAllBytes(filePath.toPath())
-                sendImageFileToGroup(filePath, byteArray, fileType)
-            }
         }
     }
 
@@ -551,143 +443,131 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
         startActivityForResult(intent, CAMERA)
     }
 
-    /**
-     * Function to send Image File to a Chat
-     * @param file file that needs to be sent to group
-     * @param byteArray ByteArray of the converted file
-     * */
-    private fun sendImageFileToGroup(file: File, byteArray: ByteArray?, fileType: Int) {
-        byteArray?.let { byteArray ->
 
-            val chunks = divideArray(byteArray, ApplicationConstants.CHUNK_SIZE)
+    private fun handleSelectionFromGallery(data: Intent?) {
 
-            chunks?.let { chunks ->
-                val headerModel = HeaderModel(
-                    prefs.loginInfo?.refId + System.currentTimeMillis(),
-                    chunks.size,
-                    byteArray.size,
-                    file.extension,
-                    groupModel?.channelName ?: "",
-                    groupModel?.channelKey ?: "",
-                    loginUserRefId,
-                    fileType
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            activity?.applicationContext?.let { context->
+                val byteArray = ImageUtils.convertImageToByte(context, Uri.parse(data?.data.toString()))
+
+                saveFileToStorage(
+                    byteArray!!,
+                    "${System.currentTimeMillis()}",
+                    "image/jpeg",
+                    "${Environment.DIRECTORY_PICTURES}/$directoryName",
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 )
-                (activity as DashboardActivity).publishCustomPacketMessage(
-                    headerModel,
-                    groupModel?.channelKey ?: "", groupModel?.channelName ?: ""
+            }
+        } else {
+
+            file = getFileData(activity as Context, data?.data, MediaType.IMAGE)
+
+        }
+
+        selectedFile = file
+        fileType = 0
+
+    }
+
+
+    private fun handleSelectionFromVideos(data: Intent?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            activity?.applicationContext?.let { context ->
+                data?.data?.let { data ->
+                    VideoPath = ImageUtils.copyFileToInternalStorage(context, data, "video")
+                    val VideoBytes = converFileToByteArray(VideoPath)
+                    saveFileToStorage(
+                        VideoBytes!!,
+                        "${System.currentTimeMillis()}",
+                        "video/mp4",
+                        "${Environment.DIRECTORY_MOVIES}/$directoryName",
+                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                    )
+                }
+
+            }
+        } else {
+            file = getFileData(activity as Context, data?.data, MediaType.VIDEO)
+        }
+        selectedFile = file
+        fileType = 2
+
+    }
+
+
+    private fun handleSelectionFromDocuments(data: Intent?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            data?.data?.let { data ->
+                activity?.let { context ->
+                    val filePath = copyFileToInternalStorage(context, data, "document")
+                    val FileBytes = converFileToByteArray(filePath)
+                    saveFileToStorage(
+                        FileBytes!!,
+                        "${System.currentTimeMillis()}",
+                        "application/pdf",
+                        "${Environment.DIRECTORY_DOCUMENTS}/$directoryName",
+                        MediaStore.Files.getContentUri("external")
+                    )
+                }
+            }
+        } else {
+            file = getFileData(activity as Context, data?.data, MediaType.FILE)
+        }
+        selectedFile  = file
+        fileType = 3
+
+    }
+
+
+    private fun handleSelectionFromCamera(data: Intent?) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            activity?.applicationContext?.let { context->
+                val byteArray = ImageUtils.convertBitmapToByteArray(
+                    data?.extras?.get("data") as Bitmap
                 )
-                if (isConnected(activity as Context))
-                    sendFilesChunksToGroup(headerModel, byteArray, fileType)
 
+                saveFileToStorage(
+                    byteArray!!,
+                    "${System.currentTimeMillis()}",
+                    "image/jpeg",
+                    "${Environment.DIRECTORY_PICTURES}/$directoryName",
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                )
             }
+        } else {
+            file = getFileData(activity as Context, getImageUri(activity?.applicationContext!!, data?.extras?.get("data") as Bitmap), MediaType.IMAGE)
 
         }
 
+        selectedFile = file
+        fileType = 0
+
     }
 
-
-    /**
-     * Function to send chunks of a large file to a group
-     * @param headerModel Header model of a file that we need to send to differentiate which file belongs to which header
-     * @param byteArray ByteArray of the File
-     * */
-    private fun sendFilesChunksToGroup(
-        headerModel: HeaderModel,
-        byteArray: ByteArray,
-        fileType: Int
-    ) {
-
-        val chunks = divideArray(byteArray, ApplicationConstants.CHUNK_SIZE)
-        val messageId = prefs.loginInfo?.refId + System.currentTimeMillis()
-
-
-        var filechunk: FileModel? = null
-        chunks?.forEachIndexed { index, bytes ->
-
-            filechunk = FileModel(
-                messageId,
-                headerModel.headerId,
-                headerModel.topic,
-                headerModel.key,
-                headerModel.from,
-                index + 1,
-                encodeAndReplaceLineBreaks(bytes),
-                fileType
-            )
-            filechunk?.let {
-                listOfChunks.add(it)
+    private fun handleSelectionFromAudio(data: Intent?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            activity?.applicationContext?.let { context ->
+                data?.data?.let { data ->
+                    val AudioPath = copyFileToInternalStorage(context, data, "audio")
+                    val AudioBytes = converFileToByteArray(AudioPath)
+                    saveFileToStorage(
+                        AudioBytes!!,
+                        "${System.currentTimeMillis()}",
+                        "audio/x-wav",
+                        "${Environment.DIRECTORY_MUSIC}/$directoryName",
+                        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+                    )
+                }
             }
+        } else {
+            file = getFileData(activity as Context, data?.data, MediaType.AUDIO)
+
         }
-
-        makeFileMap()
-
+        selectedFile = file
+        fileType = 1
     }
 
-    /**
-     * Helper function to remove string values from a string
-     * @param bytes ByteArray from which we need to remove objects
-     * @return Returns a string in base64 after removing required objects
-     * */
-    /* there was an issue that when encoded  the base64 string had line breaks in it so it was not
-    being parsed on JS side so wrote this method to replace the line breaks */
-    private fun encodeAndReplaceLineBreaks(bytes: ByteArray): String {
-        var encodedString = encodeToBase64(bytes)
-        return encodedString.replace("\n", "")
-    }
-
-    /**
-     * Helper Function to store file chunks
-     * */
-    private fun makeFileMap() {
-        if (listOfChunks.isNotEmpty()) {
-            if (!fileChunkMaps.containsKey(listOfChunks[0].headerId)){
-                fileChunkMaps[listOfChunks[0].headerId] = listOfChunks
-            }
-            startSendingChunks()
-        }
-    }
-
-    /**
-     * Function to divide a byte array to server defined chunk size of a larger file
-     * @param source ByteArray that we need to split into chunks
-     * @param chunkSize Size at which the byteArray will be divided from
-     * */
-    private fun divideArray(source: ByteArray, chunksize: Int): Array<ByteArray>? {
-        val ret = Array(Math.ceil(source.size / chunksize.toDouble()).toInt()) { ByteArray(chunksize) }
-        var start = 0
-        for (i in ret.indices) {
-            ret[i] = Arrays.copyOfRange(source, start, start + chunksize)
-            start += chunksize
-        }
-        return ret
-    }
-
-    /**
-     * Function to initiate file chunk sharing
-     * */
-    private fun startSendingChunks() {
-        val itr = fileChunkMaps.iterator()
-        while (itr.hasNext()) {
-            val model = itr.next().value.first()
-            (activity as DashboardActivity).publishCustomPacketMessage(
-                model,
-                groupModel?.channelKey ?: "",
-                groupModel?.channelName ?: ""
-            )
-            binding.progressBar.show()
-        }
-    }
-
-
-    /**
-     * Function to publish a message to the server with any type of classObject
-     * @param classObject CassObject of type any which can take up any Parcelable class
-     * @param key key from the User that is unique against every chat or group
-     * @param toGroup unique group identifier such as unique channel_id etc
-     * */
-//    fun publishCustomPacketMessage(classObject: Any, key: String, toGroup: String) {
-//        cManger.sendCustomMessage(classObject, key, toGroup)
-//    }
 
 
 
@@ -716,7 +596,6 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun onConnectionSuccess() {
-        //TODO("Not yet implemented")
     }
 
     override fun onTopicSubscribe(topic: String) {
@@ -725,11 +604,15 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
 
     override fun onNewMessage(message: Message) {
         if (message.key == groupModel?.channelKey) {
+            (activity as DashboardActivity).mapUnreadCount.clear()
             binding.progressBar.hide()
             usersList.clear()
             adapter.addItem(message)
             sendAcknowledgeMsgToGroup(message)
             scrollToLast()
+        }
+        else {
+            AllGroupsFragment.messageUpdateLiveData.postValue(message)
         }
     }
 
@@ -743,6 +626,52 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
             showOnTypingMessage(message)
         }
         Log.d(TAG_FRAGMENT_CHAT, message.toString())
+    }
+
+    override fun sendAttachment(msgId: String, fileType: Int) {
+        val activityInstance = (activity as DashboardActivity)
+        groupModel?.let { groupModel ->
+            adapter.isSend = true
+            if (fileType == MediaType.IMAGE.value) {
+                adapter.addItem(activityInstance.makeImageItemModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+                activityInstance.updateMessageMapData(activityInstance.makeImageItemModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+            } else {
+                adapter.addItem(activityInstance.makeFileModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+                activityInstance.updateMessageMapData(activityInstance.makeFileModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+            }
+            scrollToLast()
+        }
+    }
+
+    override fun recieveAttachment(msgId: String) {
+//        Toast.makeText(activity, "this", Toast.LENGTH_SHORT).show()
+
+    }
+
+    private fun getDummyheader(fileType: Int) : HeaderModel{
+        return HeaderModel("",0,0,"","","",loginUserRefId,fileType,0)
+    }
+
+    override fun attachmentProgress(msgId: String, progress: Int) {
+//        adapter.progress = progress.toFloat()
+        if (progress == 100) {
+            activity?.runOnUiThread {
+                val itemObject =  adapter.items.find { it.id == msgId }
+                val index = adapter.items.indexOf(itemObject)
+                adapter.isSend = false
+//                adapter.updateData(progress,index)
+                adapter.notifyItemChanged(index)
+//
+//
+            }
+        }
+
+
+    }
+
+    override fun attachmentReceivedFailed() {
+        binding.root.showSnackBar(R.string.attachment_failed)
+
     }
 
     override fun onReceiptReceived(model: ReadReceiptModel) {
@@ -773,7 +702,6 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
         byteArray: ByteArray,
         msgId: String
     ) {
-
     }
 
     override fun onChunkReceived(fileModel: FileModel) {
@@ -898,6 +826,10 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
 
     override fun onFileClick() {
         openFolder()
+    }
+
+    override fun onRecieptReceive(message: Message) {
+        (activity as DashboardActivity).updateMessageMapData(message)
     }
 
 }

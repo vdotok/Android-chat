@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="Gradle: com.ramijemli.percentagechartview:percentagechartview:0.3.1@aar">
+    <ANNOTATIONS>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0e526e169206116d1183a7dedf810116/jetified-percentagechartview-0.3.1/annotations.zip!/" />
+    </ANNOTATIONS>
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0e526e169206116d1183a7dedf810116/jetified-percentagechartview-0.3.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0e526e169206116d1183a7dedf810116/jetified-percentagechartview-0.3.1/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0e526e169206116d1183a7dedf810116/jetified-percentagechartview-0.3.1/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ramijemli.percentagechartview/percentagechartview/0.3.1/214ba94536dc95e9cc3c0f557ed245c26f992bb0/percentagechartview-0.3.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.ramijemli.percentagechartview/percentagechartview/0.3.1/bd512c85fbce860d4c2897e11f28e7f34407127/percentagechartview-0.3.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

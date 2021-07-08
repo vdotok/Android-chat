@@ -17,6 +17,13 @@
         <variable
             name="seenMsg"
             type="Boolean" />
+        <variable
+            name="isSend"
+            type="Boolean" />
+
+        <variable
+            name="progress_Chart"
+            type="androidx.databinding.ObservableField&lt;Float&gt;" />
 
     </data>
 
@@ -106,6 +113,32 @@
                             android:contentDescription="@string/app_name"
                             android:scaleType="centerCrop"
                             app:layout_constraintBottom_toBottomOf="parent" />
+
+                        <ProgressBar
+                            android:id="@+id/progress"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="@{isSend ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintBottom_toBottomOf="@id/image"
+                            app:layout_constraintEnd_toEndOf="@id/image"
+                            app:layout_constraintTop_toTopOf="@id/image"
+                            app:layout_constraintStart_toStartOf="@id/image"/>
+
+
+<!--                        <com.ramijemli.percentagechartview.PercentageChartView-->
+<!--                            android:id="@+id/progress"-->
+<!--                            android:layout_width="50dp"-->
+<!--                            android:layout_height="50dp"-->
+<!--                            app:pcv_mode="ring"-->
+<!--                            app:layout_constraintDimensionRatio="1"-->
+<!--                            app:pcv_orientation="clockwise"-->
+<!--                            app:pcv_animDuration="100"-->
+<!--                            app:layout_constraintBottom_toBottomOf="@id/image"-->
+<!--                            app:layout_constraintEnd_toEndOf="@id/image"-->
+<!--                            app:layout_constraintStart_toStartOf="@id/image"-->
+<!--                            app:layout_constraintTop_toTopOf="@id/image" />-->
+
                     </androidx.cardview.widget.CardView>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
@@ -122,7 +155,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="@{DateTimeUtilsKt.dateCheck()}"
                 android:textColor="@color/light_green"
                 android:gravity="bottom"
                 app:layout_constraintBottom_toBottomOf="parent"

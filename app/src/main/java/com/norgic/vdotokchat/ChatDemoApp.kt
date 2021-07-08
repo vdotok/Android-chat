@@ -11,7 +11,7 @@ class ChatDemoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         // Required initialization logic here!
-        ChatManager.getInstance(this).setConstants(ApplicationConstants.PROJECT_ID)
+        ChatManager.getInstance(this).setConstants(ApplicationConstants.SDK_TENANT_ID)
     }
     // Called by the system when the device configuration changes while your component is running.
     // Overriding this method is totally optional!

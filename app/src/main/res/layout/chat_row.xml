@@ -76,11 +76,14 @@
             android:textColor="@color/grey"
             android:textSize="14sp"
             android:visibility="invisible"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="@string/misread_message"
             app:layout_constraintEnd_toStartOf="@id/tv_status"
             app:layout_constraintStart_toStartOf="@+id/groupTitle"
-            app:layout_constraintTop_toBottomOf="@id/groupTitle"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/tv_status"
+            app:layout_constraintBottom_toBottomOf="@id/tv_status" />
         <View
             android:layout_width="wrap_content"
             android:layout_height="0.7dp"

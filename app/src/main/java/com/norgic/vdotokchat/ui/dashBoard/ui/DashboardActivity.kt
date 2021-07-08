@@ -9,11 +9,13 @@ import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ObservableBoolean
 import com.norgic.chatsdks.ChatManager
 import com.norgic.chatsdks.ChatManagerCallback
 import com.norgic.chatsdks.models.*
@@ -31,6 +33,7 @@ import com.norgic.vdotokchat.utils.createAppDirectory
 import com.norgic.vdotokchat.utils.saveFileDataOnExternalData
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.log
 
 class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
@@ -49,6 +52,8 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     private var internetConnectionRestored = false
     var file: File? = null
 
+
+    var isSocketConnected: ObservableBoolean = ObservableBoolean(false)
 
     // To save messages locally per session
     var mapGroupMessages: MutableMap<String, ArrayList<Message>> = mutableMapOf()
@@ -89,6 +94,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
     private fun initChatManager() {
         chatManger = ChatManager.getInstance(this)
+        chatManger?.setIsSenderReceiveFilePackets(false)
         chatManger?.listener = this
         connect()
 
@@ -97,7 +103,6 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     private fun connect() {
         prefs.mConnection?.let {
             it.interval = 5
-            it.reConnectivity = false
             chatManger?.connect(it)
         }
     }
@@ -166,12 +171,21 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
      * Function to help in persisting local chat by updating local data till the user is connected to the socket
      * @param message message object we will be sending to the server
      * */
-    private fun updateMessageMapData(message: Message) {
+     fun updateMessageMapData(message: Message) {
         if (mapGroupMessages.containsKey(message.to)) {
             val messageValue: ArrayList<Message> = mapGroupMessages[message.to] as ArrayList<Message>
-            messageValue.add(message)
-            mapGroupMessages[message.to] = messageValue
-            mapLastMessage[message.to] = messageValue
+            val check = messageValue.any { it.id == message.id }
+            if (!check){
+                messageValue.add(message)
+                mapGroupMessages[message.to] = messageValue
+                mapLastMessage[message.to] = messageValue
+            } else {
+                val list = mapGroupMessages[message.to] as ArrayList<Message>
+                val oldValue = list.filter { it.id == message.id}.first()
+                list[list.indexOf(oldValue)] = message
+                mapGroupMessages[message.to] = list
+            }
+
 
         } else {
             val messageValue: ArrayList<Message> = ArrayList()
@@ -228,6 +242,12 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
         return false
     }
 
+    private fun getMessageCount(message: Message) {
+        message.to.let {
+            mapUnreadCount[it] = mapUnreadCount[it]?.plus(1) ?: 1
+        }
+    }
+
     /**
      * Function to inform server that user is online hence providing online status to other users this user is connected to
      * @param groupModel is the group in which user will show online status
@@ -243,6 +263,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     //Callbacks
     override fun onConnect() {
         Log.e("Connection Status", "Connected")
+        isSocketConnected.set(true)
             mListener?.onConnectionSuccess()
 //        binding.root.showSnackBar(R.string.sdk_connected)
 //        doSubscribe()
@@ -254,14 +275,55 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
      * */
     override fun onConnectionFailed(cause: Throwable) {
         chatManger = null
-        mListener?.onConnectionFailed()
-        Log.e("Connection Status", cause.toString())
+        isSocketConnected.set(false)
+//        mListener?.onConnectionFailed()
+//        Log.e("Connection Status", cause.toString())
     }
 
     override fun onConnectionLost(cause: Throwable) {
         chatManger = null
-        mListener?.onConnectionLost()
-        Log.e("Connection Status", cause.toString())
+        isSocketConnected.set(false)
+//        mListener?.onConnectionLost()
+//        Log.e("Connection Status", cause.toString())
+    }
+
+    override fun onFileReceivingCompleted(
+        headerModel: HeaderModel,
+        byteArray: ByteArray,
+        msgId: String
+    ) {
+        checkAndroidVersionToSave(headerModel, byteArray)
+        sendAttachmentMessage(headerModel, file, msgId)
+
+    }
+
+    override fun onFileReceivingFailed() {
+        mListener?.attachmentReceivedFailed()
+    }
+
+    override fun onFileReceivingProgressChanged(fileHeaderId: String, progress: Int) {
+//        TODO("Not yet implemented")
+    }
+
+    override fun onFileReceivingStarted(fileHeaderId: String) {
+        mListener?.recieveAttachment(fileHeaderId)
+    }
+
+    override fun onFileSendingComplete(fileHeaderId: String, fileType: Int) {
+    }
+
+
+    override fun onFileSendingFailed(headerId: String) {
+//        TODO("Not yet implemented")
+    }
+
+    override fun onFileSendingProgressChanged(fileHeaderId: String, progress: Int) {
+        mListener?.attachmentProgress(fileHeaderId, progress)
+    }
+
+    override fun onFileSendingStarted(fileHeaderId: String, fileType: Int) {
+        mListener?.sendAttachment(fileHeaderId, fileType)
+
     }
 
     /**
@@ -313,6 +375,11 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
      * @param myMessage message object we will be sending to the server
      * */
     override fun onMessageArrived(myMessage: Message) {
+
+        myMessage.to.let {
+            mapUnreadCount[it] = mapUnreadCount[it]?.plus(1) ?: 1
+        }
+
         mListener?.onNewMessage(myMessage)
         updateMessageMapData(myMessage)
     }
@@ -334,10 +401,10 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     }
 
 
-    override fun onReceiveFileCompleted(headerModel: HeaderModel, byteArray: ByteArray, msgId: String) {
-        checkAndroidVersionToSave(headerModel, byteArray)
-        sendAttachmentMessage(headerModel, file, msgId)
-    }
+//    override fun onReceiveFileCompleted(headerModel: HeaderModel, byteArray: ByteArray, msgId: String) {
+//        checkAndroidVersionToSave(headerModel, byteArray)
+//        sendAttachmentMessage(headerModel, file, msgId)
+//    }
 
     fun sendAttachmentMessage(headerModel: HeaderModel, files: File?, msgId: String) {
 
@@ -352,6 +419,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
                                 message = makeImageItemModel(files, headerModel, it, msgId)!!
                                 message?.let { message ->
                                     updateMessageMapData(message)
+                                    getMessageCount(message)
                                     mListener?.onNewMessage(message)
                                 }
 
@@ -361,6 +429,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
                                 message = makeFileModel(files, headerModel, it, msgId)!!
                                 message?.let { message ->
                                     updateMessageMapData(message)
+                                    getMessageCount(message)
                                     mListener?.onNewMessage(message)
                                 }
 
@@ -369,6 +438,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
                                 message = makeFileModel(files, headerModel, it, msgId)!!
                                 message?.let { message ->
                                     updateMessageMapData(message)
+                                    getMessageCount(message)
                                     mListener?.onNewMessage(message)
                                 }
                             }
@@ -377,6 +447,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
                                 message = makeFileModel(files, headerModel, it, msgId)!!
                                 message?.let { message ->
                                     updateMessageMapData(message)
+                                    getMessageCount(message)
                                     mListener?.onNewMessage(message)
                                 }
                             }
@@ -455,7 +526,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 //        })
 //    }
 
-    private fun makeFileModel(
+    fun makeFileModel(
             file: File?,
             headerModel: HeaderModel,
             groupModel: GroupModel,
@@ -544,20 +615,16 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
         }
     }
 
-    /**
-     * Callback method when user a received a chunk of a large file
-     * @param fileModel file chunk of a larger file that is being sent by the sender
-     * */
-    override fun onChunkReceived(fileModel: FileModel) {
-        mListener?.onChunkReceived(fileModel)
-    }
 
     /** callback fired if there is a fluctuation in network i.e. it is disconnected and reconnected
      * so to inform that the socket successfully reconnected again
      * @param connectionState Boolean informing the the socket is reconnected or not
      * */
     override fun reconnectAction(connectionState: Boolean) {
-        //if (connectionState) doSubscribe()
+        if (connectionState) {
+            mListener?.onConnectionSuccess()
+            isSocketConnected.set(true)
+        }
     }
 
     /** callback fired to inform socket is connected or not before sending messages **/

@@ -6,6 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.MutableLiveData
 import androidx.navigation.Navigation
 import com.norgic.chatsdks.ChatManager
 import com.norgic.chatsdks.models.*
@@ -83,8 +85,15 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
             binding.customToolbar.title.text = info.fullName
         }
 
+        messageUpdateLiveData.observe(this.viewLifecycleOwner, { message ->
+
+            adapter.notifyDataSetChanged()
+
+            sendAcknowledgeMsgToGroup(message)
+        })
 
         binding.tvUsername.text = prefs.loginInfo?.fullName
+        binding.isSocketConnected = (activity as DashboardActivity).isSocketConnected
         binding.tvLogout.setOnClickListener {
             cManger.disconnect()
             prefs.deleteKeyValuePair(LOGIN_INFO)
@@ -210,15 +219,6 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         cManger.publishPacketMessage(classObject, key, toGroup)
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (cManger.isConnected()) {
-            binding.tvLed.setImageResource(R.drawable.led_connected)
-        } else {
-            binding.tvLed.setImageResource(R.drawable.led_error)
-        }
-    }
-
     private fun addPullToRefresh() {
         binding.swipeRefreshLay.isEnabled = true
         binding.swipeRefreshLay.setOnRefreshListener {
@@ -317,7 +317,6 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     }
 
     override fun onConnectionSuccess() {
-        binding.tvLed.setImageResource(R.drawable.led_connected)
         doSubscribe()
     }
 
@@ -330,14 +329,16 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
 
     override fun onNewMessage(message: Message) {
         if ((activity as DashboardActivity).mapUnreadCount.containsKey(message.to)) {
-            val count = (activity as DashboardActivity).mapUnreadCount[message.to]
-            (activity as DashboardActivity).mapUnreadCount[message.to] = count?.plus(1) ?: 0
+//            val count = (activity as DashboardActivity).mapUnreadCount[message.to]
+//            (activity as DashboardActivity).mapUnreadCount[message.to] = count?.plus(1) ?: 0
             adapter.notifyDataSetChanged()
 
         } else {
-            (activity as DashboardActivity).mapUnreadCount[message.to] = 1
+//            (activity as DashboardActivity).mapUnreadCount[message.to] = 1
             adapter.notifyDataSetChanged()
         }
+//        adapter.notifyDataSetChanged()
+
         sendAcknowledgeMsgToGroup(message)
     }
 
@@ -369,6 +370,20 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         Log.d("", "")
     }
 
+    override fun sendAttachment(msgId: String, fileType: Int) {
+    }
+
+    override fun recieveAttachment(msgId: String) {
+
+    }
+
+    override fun attachmentProgress(msgId: String, progress: Int) {
+    }
+
+    override fun attachmentReceivedFailed() {
+
+    }
+
     override fun onReceiptReceived(model: ReadReceiptModel) {
         //TODO("Not yet implemented")
     }
@@ -398,11 +413,9 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     }
 
     override fun onConnectionFailed() {
-        binding.tvLed.setImageResource(R.drawable.led_error)
     }
 
     override fun onConnectionLost() {
-        binding.tvLed.setImageResource(R.drawable.led_error)
     }
 
 
@@ -445,6 +458,8 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
 
     companion object {
         const val PRESENCE_KEY = "PRESENCE_KEY"
+        val messageUpdateLiveData = MutableLiveData<Message>()
+
     }
 
 

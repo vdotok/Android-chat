@@ -1,18 +1,11 @@
 package com.norgic.vdotokchat.ui.dashBoard.adapter
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.PopupWindow
-import android.widget.TextView
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
+import androidx.databinding.ObservableField
 import androidx.recyclerview.widget.RecyclerView
 import com.norgic.chatsdks.models.Message
 import com.norgic.chatsdks.models.MessageType
@@ -23,17 +16,26 @@ import com.norgic.vdotokchat.databinding.ItemMessageTypeTextBinding
 import com.norgic.vdotokchat.extensions.hide
 import com.norgic.vdotokchat.extensions.show
 import com.norgic.vdotokchat.ui.dashBoard.ui.ChatFragment
-import com.norgic.vdotokchat.models.GroupModel
-import com.norgic.vdotokchat.utils.ApplicationConstants
 import com.norgic.vdotokchat.utils.ImageUtils
-import java.io.File
+import com.norgic.vdotokchat.utils.timeCheck
+import java.util.*
 import kotlin.collections.ArrayList
 
 
-class ChatListAdapter (private val context: Context, private val chatFragment: ChatFragment, private val userName: String, list: List<Message>, private val callBack: OnMediaItemClickCallbackListner, val groupItemClick : () -> Unit, val unreadMessage : (Message) -> Unit):
+class ChatListAdapter(
+    private val context: Context,
+    private val chatFragment: ChatFragment,
+    private val userName: String,
+    list: List<Message>,
+    private val callBack: OnMediaItemClickCallbackListner,
+    val groupItemClick: () -> Unit,
+    val unreadMessage: (Message) -> Unit
+):
     RecyclerView.Adapter<ChatViewHolder>() {
 
     var items: ArrayList<Message> = ArrayList()
+    var isSend: Boolean = false
+//    var progress : Float = 0.0f
 
     init {
         items.addAll(list)
@@ -45,7 +47,12 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
     }
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
+        holder.binding?.isSend = isSend
         val data = items[position]
+//        if (holder.binding?.progress != null) {
+//            holder.binding?.progress?.setProgress(data.progress, false )
+//            holder.binding?.progress?.show()
+//        }
         if (data.from == userName) {
             holder.binding?.isSender = true
             when (data.status) {
@@ -55,7 +62,7 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
 
 
         }else{
-            if (data.status == ReceiptType.DELIVERED.value) {
+            if (data.status == ReceiptType.DELIVERED.value || data.status == ReceiptType.SENT.value ) {
                 unreadMessage.invoke(data)
             }
             holder.binding?.isSender = false
@@ -64,6 +71,7 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
         when (data.type) {
             MessageType.text -> {
                 holder.binding?.imageCard?.hide()
+                holder.binding?.tvTime?.text = timeCheck(data.date)
                 holder.binding?.cardAttachment?.visibility = View.GONE
                 holder.binding?.imageCard?.hide()
                 holder.binding?.tvMessage?.show()
@@ -74,16 +82,18 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
                     0 -> {
                         holder.binding?.tvMessage?.hide()
                         holder.binding?.cardAttachment?.hide()
+                        holder.binding?.tvTime?.text = timeCheck(data.date)
                         holder.binding?.imageCard?.show()
                         holder.binding?.image?.setImageBitmap(ImageUtils.decodeBase64(data.content))
                         holder.binding?.imageCard?.setOnClickListener {
                             callBack.onFileClick()
                         }
-                        }
+                    }
 
                     2 -> {
                         holder.binding?.tvMessage?.hide()
                         holder.binding?.imageCard?.hide()
+                        holder.binding?.tvTime?.text = timeCheck(data.date)
                         holder.binding?.cardAttachment?.show()
                         holder.binding?.attachmentText?.setText(R.string.video_file)
                         holder.binding?.cardAttachment?.setOnClickListener {
@@ -93,6 +103,7 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
                     3 -> {
                         holder.binding?.tvMessage?.hide()
                         holder.binding?.imageCard?.hide()
+                        holder.binding?.tvTime?.text = timeCheck(data.date)
                         holder.binding?.cardAttachment?.show()
                         holder.binding?.attachmentText?.setText(R.string.doc_file)
                         holder.binding?.cardAttachment?.setOnClickListener {
@@ -102,6 +113,7 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
                     1 -> {
                         holder.binding?.tvMessage?.hide()
                         holder.binding?.imageCard?.hide()
+                        holder.binding?.tvTime?.text = timeCheck(data.date)
                         holder.binding?.cardAttachment?.show()
                         holder.binding?.attachmentText?.setText(R.string.audio_file)
                         holder.binding?.cardAttachment?.setOnClickListener {
@@ -110,7 +122,7 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
                     }
                 }
 
-                }
+            }
 
             else -> { //holder.binding?.root?.hide()
              }
@@ -127,20 +139,11 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
     override fun getItemCount(): Int = items.size
 
 
-//    private fun openFolder(context: Context) {
-//        val intent = Intent(Intent.ACTION_VIEW)
-//        val uri = Uri.parse(
-//            Environment.getExternalStorageDirectory().absolutePath +
-//                ApplicationConstants.DOCS_DIRECTORY + File.separator)
-//        intent.setDataAndType(uri, "*/*")
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        context.startActivity(Intent.createChooser(intent, "Open folder"))
-//    }
+    fun updateData(progress: Int, position: Int) {
+        val message = items[position]
+        message.progress = progress.toFloat()
 
-    fun updateData(userModelList: List<Message>) {
-        items.clear()
-        items.addAll(userModelList)
-        notifyDataSetChanged()
+        notifyItemChanged(position)
     }
 
     fun updateMessageForReceipt(model: ReadReceiptModel) {
@@ -149,15 +152,26 @@ class ChatListAdapter (private val context: Context, private val chatFragment: C
         items.forEachIndexed { index, message ->
             if(message.id == model.messageId){
                 message.status = model.receiptType
+                callBack.onRecieptReceive(message)
                 items[index] = message
                 notifyItemChanged(index)
+                return
             }
         }
 
 
     }
 
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+
+    }
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
+
     fun addItem(item: Message) {
+        item.date = System.currentTimeMillis()
         items.add(item)
         notifyItemInserted(itemCount - 1)
         notifyItemInserted(itemCount)
@@ -175,5 +189,6 @@ class ChatViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
 }
 interface OnMediaItemClickCallbackListner {
     fun onFileClick()
+    fun onRecieptReceive(message: Message)
 }
 

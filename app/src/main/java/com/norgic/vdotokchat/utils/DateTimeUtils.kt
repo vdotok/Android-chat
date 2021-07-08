@@ -9,13 +9,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @SuppressLint("SimpleDateFormat")
-fun dateCheck() : String {
-
-    val currentTime = System.currentTimeMillis()
+fun timeCheck(milli: Long): String {
     val simpleDateFormat = SimpleDateFormat("hh:mm")
-    val date = Date(currentTime)
-
-    return simpleDateFormat.format(date)
+    return simpleDateFormat.format(milli)
 }
 fun showDeleteGroupAlert(
     activity: FragmentActivity?,
