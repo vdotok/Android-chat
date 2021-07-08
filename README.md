@@ -22,14 +22,12 @@ To Download Chat Lib
 * https://sdk.vdotok.com/Android-SDKs/
 
 Code setup
-* Copy and Paste Github URL “https://github.com/RazaNorgic/VDOTOK-Android-chat”
-* Click on “Code” button
-* From HTTPS section copy repo URL
 * Open Android Studio
+* From File menu Select New or select "Get from Version Control From opening dialog box"
 * Click on “Get from Version Control”
 * Select “Repository URL” from left menu
 * Select “Git” from Version control dropdown menu
-* Paste copied URL in URL section
+* Paste this URL "https://github.com/vdotok/Android-chat.git" in URL section
 * click on clone button and wait for build .gradle files you can see the progress on bottom of android studio
 * let the android studio install the components, 
 * Hurrraaaa you Just configure the project in android studio
