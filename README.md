@@ -4,7 +4,7 @@ IDE Installation & Build Guide
 ==============================
 Requirements
 * Android Studio 4.1.2 or later
-* you can follow the link to download and install Android Stuiod
+* you can follow the link to download and install Android Studio
     * “https://developer.android.com/studio?gclid=Cj0KCQjwhr2FBhDbARIsACjwLo2fEHdB3l3eqRlhIvySYNx1-3XjDmuX1eSCbaCI7zU8FKHFkGBcVyMaAtSjEALw_wcB&gclsrc=aw.ds#downloads”
 * Android SDKs 21(Lollipop) or later
     * For downloading Android SDKs
@@ -49,7 +49,7 @@ Configure Lib
 * “implementation project(path: ':norgic-chatsdk-v1.0.0’)”
 <img width="765" alt="dependencie" src="https://user-images.githubusercontent.com/86282129/123636324-28d7d880-d836-11eb-8af3-8e06534eca4e.png">
 * Click on “sync now” Button from top right corner
-* From File explorer open chattApp -> app -> src -> main -> java -> com -> norgic -> vdotokchat -> utils -> ApplicationConstants replace “SDK_TENANT_ID” with your own TenantID 
+* From File explorer open chattApp -> app -> src -> main -> java -> com -> norgic -> vdotokchat -> utils -> ApplicationConstants replace “PROJECT_ID ” with your own Project Id 
 
 Build Project 
 * Connect your phone with system in file sharing mode
