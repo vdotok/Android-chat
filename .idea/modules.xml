@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/VdoTokChat.iml" filepath="$PROJECT_DIR$/.idea/modules/VdoTokChat.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/VdoTokChat.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/VdoTokChat.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/chatSDK/VdoTokChat.chatSDK.iml" filepath="$PROJECT_DIR$/.idea/modules/chatSDK/VdoTokChat.chatSDK.iml" />
     </modules>
   </component>
 </project>

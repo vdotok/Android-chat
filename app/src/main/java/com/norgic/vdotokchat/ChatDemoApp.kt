@@ -3,6 +3,7 @@ package com.norgic.vdotokchat
 import android.app.Application
 import android.content.res.Configuration
 import com.norgic.chatsdks.ChatManager
+
 import com.norgic.vdotokchat.utils.ApplicationConstants
 
 class ChatDemoApp : Application() {
@@ -11,7 +12,7 @@ class ChatDemoApp : Application() {
     override fun onCreate() {
         super.onCreate()
         // Required initialization logic here!
-        ChatManager.getInstance(this).setConstants(ApplicationConstants.SDK_TENANT_ID)
+        ChatManager.getInstance(this).setConstants(ApplicationConstants.PROJECT_ID)
     }
     // Called by the system when the device configuration changes while your component is running.
     // Overriding this method is totally optional!
