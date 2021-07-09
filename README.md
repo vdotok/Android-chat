@@ -3,7 +3,7 @@ vdotok-Android-chat
 IDE Installation & Build Guide
 ==============================
 Requirements
-* Android Studio 4.1.2 or later
+* Android Studio 4.1.2 or later (Stable Version)
 * you can follow the link to download and install Android Studio
     * “https://developer.android.com/studio?gclid=Cj0KCQjwhr2FBhDbARIsACjwLo2fEHdB3l3eqRlhIvySYNx1-3XjDmuX1eSCbaCI7zU8FKHFkGBcVyMaAtSjEALw_wcB&gclsrc=aw.ds#downloads”
 * Android SDKs 21(Lollipop) or later
