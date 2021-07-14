@@ -46,7 +46,7 @@ Configure Lib
 <img width="498" alt="No Devices" src="https://user-images.githubusercontent.com/86282129/123636395-41e08980-d836-11eb-8643-429d6e5510d5.png">
 
 * And then go to ChattApp -> app -> src -> build.gradle and past following line in Dependencies  section
-* “implementation project(path: ':norgic-chatsdk-v1.0.0’)”
+* “implementation project(path: ':norgic-chatsdk-v1.0.0')”
 <img width="765" alt="dependencie" src="https://user-images.githubusercontent.com/86282129/123636324-28d7d880-d836-11eb-8af3-8e06534eca4e.png">
 * Click on “sync now” Button from top right corner
 * From File explorer open chattApp -> app -> src -> main -> java -> com -> norgic -> vdotokchat -> utils -> ApplicationConstants replace “PROJECT_ID ” with your own Project Id 
