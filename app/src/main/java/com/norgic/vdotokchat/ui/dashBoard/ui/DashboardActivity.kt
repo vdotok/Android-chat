@@ -16,8 +16,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableBoolean
-import com.norgic.chatsdks.ChatManager
-import com.norgic.chatsdks.ChatManagerCallback
+import com.norgic.chatsdks.manager.ChatManager
+import com.norgic.chatsdks.manager.ChatManagerCallback
 import com.norgic.chatsdks.models.*
 import com.norgic.chatsdks.models.Message
 import com.norgic.vdotokchat.R
@@ -60,6 +60,8 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     var mapUnreadCount: MutableMap<String, Int> = mutableMapOf()
     var mapLastMessage: MutableMap<String, ArrayList<Message>> = mutableMapOf()
     var savedPresenceList: ArrayList<Presence> = ArrayList()
+
+    var lastMessageGroupKey = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -192,8 +194,6 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
             messageValue.add(message)
             mapGroupMessages[message.to] = messageValue
             mapLastMessage[message.to] = messageValue
-
-
         }
     }
 
@@ -310,6 +310,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     }
 
     override fun onFileSendingComplete(fileHeaderId: String, fileType: Int) {
+        mListener?.onFileSendingComplete()
     }
 
 
@@ -375,6 +376,8 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
      * @param myMessage message object we will be sending to the server
      * */
     override fun onMessageArrived(myMessage: Message) {
+
+        lastMessageGroupKey = myMessage.key
 
         myMessage.to.let {
             mapUnreadCount[it] = mapUnreadCount[it]?.plus(1) ?: 1

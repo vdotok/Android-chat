@@ -54,19 +54,19 @@ class Prefs(context: Context?) {
             mEditor.apply()
         }
 
-    var sdkAuthResponse: AuthenticationResponse?
-        get(){
-            val gson = Gson()
-            val json = mPrefs.getString(SDK_AUTH_RESPONSE, "")
-            return gson.fromJson(json, AuthenticationResponse::class.java)
-        }
-        set(authResponse) {
-            val mEditor: SharedPreferences.Editor = mPrefs.edit()
-            val gson = Gson()
-            val json = gson.toJson(authResponse)
-            mEditor.putString(SDK_AUTH_RESPONSE, json)
-            mEditor.apply()
-        }
+//    var sdkAuthResponse: AuthenticationResponse?
+//        get(){
+//            val gson = Gson()
+//            val json = mPrefs.getString(SDK_AUTH_RESPONSE, "")
+//            return gson.fromJson(json, AuthenticationResponse::class.java)
+//        }
+//        set(authResponse) {
+//            val mEditor: SharedPreferences.Editor = mPrefs.edit()
+//            val gson = Gson()
+//            val json = gson.toJson(authResponse)
+//            mEditor.putString(SDK_AUTH_RESPONSE, json)
+//            mEditor.apply()
+//        }
 
     /**
      * Function to save a list of any type in prefs

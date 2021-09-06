@@ -44,7 +44,7 @@ class AllGroupsListAdapter(private val context: Context, private val prefs: Pref
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        val model = filteredItems[position]
+        val model = items[position]
         clickedPostion = position
         getLastMessge.invoke(model)
         if (getLastMessge.invoke(model).size > 0) {
@@ -192,7 +192,7 @@ class AllGroupsListAdapter(private val context: Context, private val prefs: Pref
         }
     }
 
-    override fun getItemCount(): Int = filteredItems.size
+    override fun getItemCount(): Int = items.size
 
     fun updateData(userModelList: List<GroupModel>) {
         items.clear()

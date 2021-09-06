@@ -21,4 +21,5 @@ interface FragmentRefreshListener {
     fun onChunkReceived(fileModel: FileModel)
     fun onConnectionFailed()
     fun onConnectionLost()
+    fun onFileSendingComplete()
 }

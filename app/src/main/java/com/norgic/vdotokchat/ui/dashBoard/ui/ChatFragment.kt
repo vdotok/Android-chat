@@ -5,7 +5,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -18,13 +17,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
-import androidx.navigation.Navigation
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.norgic.chatsdks.ChatManager
+import com.norgic.chatsdks.manager.ChatManager
 import com.norgic.chatsdks.models.*
 import com.norgic.vdotokchat.R
 import com.norgic.vdotokchat.databinding.LayoutChatFragmentBinding
@@ -37,13 +32,9 @@ import com.norgic.vdotokchat.ui.dashBoard.adapter.OnMediaItemClickCallbackListne
 import com.norgic.vdotokchat.ui.fragments.ChatMangerListenerFragment
 import com.norgic.vdotokchat.utils.*
 import com.norgic.vdotokchat.utils.ApplicationConstants.REQUEST_CODE_GALLERY
-import com.norgic.vdotokchat.utils.ConnectivityStatus.Companion.isConnected
-import com.norgic.vdotokchat.utils.ImageUtils.calculateInSampleSize
 import com.norgic.vdotokchat.utils.ImageUtils.copyFileToInternalStorage
 import com.norgic.vdotokchat.utils.ImageUtils.encodeToBase64
 import java.io.*
-import java.nio.file.Files
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.timerTask
@@ -296,6 +287,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
 
+    var tempUriToDeleteAfterSendFileComplete: Uri? = null
     private fun saveFileToStorage(
         bytes: ByteArray,
         displayName: String,
@@ -323,7 +315,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
                 file = File(copyFileToInternalStorage(context, uri, directoryName))
                 contentValu.clear()
                 activity?.applicationContext?.contentResolver?.update(uri, contentValu, null, null)
-
+                tempUriToDeleteAfterSendFileComplete = uri
             }
         }
     }
@@ -596,6 +588,9 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun onConnectionSuccess() {
+        groupModel?.let {
+            cManger?.subscribeTopic(it.channelKey, it.channelName)
+        }
     }
 
     override fun onTopicSubscribe(topic: String) {
@@ -603,16 +598,18 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun onNewMessage(message: Message) {
-        if (message.key == groupModel?.channelKey) {
-            (activity as DashboardActivity).mapUnreadCount.clear()
-            binding.progressBar.hide()
-            usersList.clear()
-            adapter.addItem(message)
-            sendAcknowledgeMsgToGroup(message)
-            scrollToLast()
-        }
-        else {
-            AllGroupsFragment.messageUpdateLiveData.postValue(message)
+        activity?.runOnUiThread {
+            if (message.key == groupModel?.channelKey) {
+                (activity as DashboardActivity).mapUnreadCount.clear()
+                binding.progressBar.hide()
+                usersList.clear()
+                adapter.addItem(message)
+                sendAcknowledgeMsgToGroup(message)
+                scrollToLast()
+            }
+            else {
+                AllGroupsFragment.messageUpdateLiveData.postValue(message)
+            }
         }
     }
 
@@ -629,18 +626,24 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun sendAttachment(msgId: String, fileType: Int) {
-        val activityInstance = (activity as DashboardActivity)
-        groupModel?.let { groupModel ->
-            adapter.isSend = true
-            if (fileType == MediaType.IMAGE.value) {
-                adapter.addItem(activityInstance.makeImageItemModel(file,getDummyheader(fileType),groupModel,msgId)!!)
-                activityInstance.updateMessageMapData(activityInstance.makeImageItemModel(file,getDummyheader(fileType),groupModel,msgId)!!)
-            } else {
-                adapter.addItem(activityInstance.makeFileModel(file,getDummyheader(fileType),groupModel,msgId)!!)
-                activityInstance.updateMessageMapData(activityInstance.makeFileModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+
+        activity?.runOnUiThread {
+
+            val activityInstance = (activity as DashboardActivity)
+            groupModel?.let { groupModel ->
+                adapter.isSend = true
+                if (fileType == MediaType.IMAGE.value) {
+                    adapter.addItem(activityInstance.makeImageItemModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+                    activityInstance.updateMessageMapData(activityInstance.makeImageItemModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+                } else {
+                    adapter.addItem(activityInstance.makeFileModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+                    activityInstance.updateMessageMapData(activityInstance.makeFileModel(file,getDummyheader(fileType),groupModel,msgId)!!)
+                }
+                scrollToLast()
             }
-            scrollToLast()
+
         }
+
     }
 
     override fun recieveAttachment(msgId: String) {
@@ -682,18 +685,21 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun onBytesArrayReceived(payload: ByteArray?) {
-        payload?.let {
-            val model = Message(
-                System.currentTimeMillis().toString(),
-                groupModel?.channelName ?: "",
-                groupModel?.channelKey ?: "",
-                loginUserRefId,
-                MessageType.media,
-                encodeToBase64(it),
-                0f,
-                getIsGroupMessage()
-            )
-            adapter.addItem(model)
+        activity?.runOnUiThread {
+
+            payload?.let {
+                val model = Message(
+                    System.currentTimeMillis().toString(),
+                    groupModel?.channelName ?: "",
+                    groupModel?.channelKey ?: "",
+                    loginUserRefId,
+                    MessageType.media,
+                    encodeToBase64(it),
+                    0f,
+                    getIsGroupMessage()
+                )
+                adapter.addItem(model)
+            }
         }
     }
 
@@ -729,6 +735,22 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun onConnectionLost() {
+    }
+
+    override fun onFileSendingComplete() {
+        activity?.runOnUiThread {
+            deleteTempFile()
+        }
+    }
+
+    private fun deleteTempFile() {
+        val resolver = activity?.applicationContext?.contentResolver
+        tempUriToDeleteAfterSendFileComplete?.let {
+            val result: Int? = resolver?.delete(it, null, null)
+            if (result != null && result > 0) {
+                Log.d("Tag", "File deleted")
+            }
+        }
     }
 
     private fun openInboxFragment() {

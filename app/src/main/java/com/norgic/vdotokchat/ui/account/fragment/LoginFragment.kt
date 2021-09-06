@@ -13,6 +13,7 @@ import androidx.navigation.Navigation
 import com.norgic.vdotokchat.R
 import com.norgic.vdotokchat.databinding.LayoutFragmentLoginBinding
 import com.norgic.vdotokchat.extensions.*
+import com.norgic.vdotokchat.models.AuthenticationResponse
 import com.norgic.vdotokchat.models.LoginResponse
 import com.norgic.vdotokchat.models.LoginUserModel
 import com.norgic.vdotokchat.network.HttpResponseCodes

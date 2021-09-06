@@ -9,7 +9,7 @@ fun saveResponseToPrefs(prefs: Prefs, response: LoginResponse?) {
 
     response?.let {
 
-        val connection = prefs.sdkAuthResponse?.messagingServer?.let { msgServerUrl ->
+        val connection = prefs.loginInfo?.messagingServer?.let { msgServerUrl ->
             response.refId?.let { refId ->
                 response.authorizationToken?.let { token ->
                     Connection(

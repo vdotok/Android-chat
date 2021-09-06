@@ -33,4 +33,36 @@ class LoginResponse {
 
     @SerializedName("userid")
     var userId: String? = null
+
+    @SerializedName("media_server_map")
+    val mediaServer: MessagingServerMap? = null
+
+    @SerializedName("messaging_server_map")
+    val messagingServer: MessagingServerMap? = null
+
+    data class MediaServerMap(
+
+        @SerializedName("complete_address")
+        val completeAddress: String,
+        @SerializedName("end_point")
+        val endPoint: String,
+        @SerializedName("host")
+        val host: String,
+        @SerializedName("port")
+        val port: String,
+        @SerializedName("protocol")
+        val protocol: String
+    )
+
+    data class MessagingServerMap(
+        @SerializedName("complete_address")
+        val completeAddress: String,
+        @SerializedName("host")
+        val host: String,
+        @SerializedName("port")
+        val port: String,
+        @SerializedName("protocol")
+        val protocol: String
+    )
+
 }

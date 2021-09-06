@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.Navigation
-import com.norgic.chatsdks.ChatManager
+import com.norgic.chatsdks.manager.ChatManager
 import com.norgic.chatsdks.models.*
 import com.norgic.vdotokchat.R
 import com.norgic.vdotokchat.databinding.LayoutFragmentInboxBinding
@@ -121,7 +121,6 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         initRecyclerView()
         addPullToRefresh()
         getAllGroups()
-
     }
 
     private fun getAllGroups() {
@@ -233,15 +232,43 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
             binding.groupChatListing.show()
             binding.rcvUserList.hide()
         } else {
-            binding.groupChatListing.hide()
-            binding.rcvUserList.show()
-            prefs.saveUpdateGroupList(response.groups)
-            adapter.updateData(response.groups)
-            setGroupMapData(response.groups)
+
             dataSet.clear()
             dataSet.addAll(response.groups)
+
+            addLastMessageGroupToTop()
+
+            binding.groupChatListing.hide()
+            binding.rcvUserList.show()
+
+            prefs.saveUpdateGroupList(dataSet)
+            setGroupMapData(dataSet)
+
             doSubscribe()
         }
+    }
+
+    private fun addLastMessageGroupToTop() {
+
+        if(prefs.getGroupList()?.size == dataSet.size){
+            val lastGroupMessageKey = (activity as DashboardActivity).lastMessageGroupKey
+            var lastUpdatedGroupIndex = -1
+            var lastUpdatedGroupModel: GroupModel? = null
+
+            dataSet.forEachIndexed { index, groupModel ->
+                if(groupModel.channelKey == lastGroupMessageKey){
+                    lastUpdatedGroupIndex = index
+                    lastUpdatedGroupModel = groupModel
+                    return@forEachIndexed
+                }
+            }
+            lastUpdatedGroupModel?.let {
+                dataSet.removeAt(lastUpdatedGroupIndex)
+                dataSet.add(0, it)
+            }
+        }
+
+        adapter.updateData(dataSet)
     }
 
     /**
@@ -328,6 +355,8 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     }
 
     override fun onNewMessage(message: Message) {
+        addLastMessageGroupToTop()
+
         if ((activity as DashboardActivity).mapUnreadCount.containsKey(message.to)) {
 //            val count = (activity as DashboardActivity).mapUnreadCount[message.to]
 //            (activity as DashboardActivity).mapUnreadCount[message.to] = count?.plus(1) ?: 0
@@ -416,6 +445,9 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     }
 
     override fun onConnectionLost() {
+    }
+
+    override fun onFileSendingComplete() {
     }
 
 

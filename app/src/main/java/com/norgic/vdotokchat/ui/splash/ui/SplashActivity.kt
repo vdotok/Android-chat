@@ -19,14 +19,16 @@ import com.norgic.vdotokchat.ui.account.ui.AccountActivity.Companion.createAccou
 import com.norgic.vdotokchat.ui.dashBoard.ui.DashboardActivity.Companion.createDashboardActivity
 import com.norgic.vdotokchat.utils.ApplicationConstants.HTTP_CODE_NO_NETWORK
 import com.norgic.vdotokchat.utils.ApplicationConstants.SDK_API_KEY
-import com.norgic.vdotokchat.utils.ApplicationConstants.PROJECT_ID
+import com.norgic.vdotokchat.utils.ApplicationConstants.SDK_TENANT_ID
 import com.norgic.vdotokchat.utils.safeApiCall
 import com.norgic.vdotokchat.network.Result
+import com.norgic.vdotokchat.utils.saveResponseToPrefs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import retrofit2.Response
 
 class SplashActivity : AppCompatActivity() {
 
@@ -46,7 +48,8 @@ class SplashActivity : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
 
-        initSdkAuth()
+//        initSdkAuth()
+        performAuthOperations()
     }
 
     private fun initSdkAuth() {
@@ -56,7 +59,7 @@ class SplashActivity : AppCompatActivity() {
             val response = safeApiCall { service.authSDK (
                     AuthenticationRequest(
                             SDK_API_KEY,
-                            PROJECT_ID)
+                            SDK_TENANT_ID)
             ) }
 
             withContext(Dispatchers.Main) {
@@ -92,7 +95,7 @@ class SplashActivity : AppCompatActivity() {
     private fun handleSdkAuthResponse(response: AuthenticationResponse) {
         when(response.status) {
             HttpResponseCodes.SUCCESS.valueInInt -> {
-                prefs.sdkAuthResponse = response
+//                prefs.sdkAuthResponse = response
                 performAuthOperations()
             }
             else -> {

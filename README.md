@@ -17,10 +17,6 @@ Project Signup and Project ID
 * Follow the link below register your self for chat server and get the project Id
 * https://www.vdotok.com/
 
-To Download Chat Lib
-* Follow the link below and download “<b>norgic-chatsdk-v1.0.0.aar</b>” file
-* https://sdk.vdotok.com/Android-SDKs/
-
 Code setup
 * Open Android Studio
 * From File menu Select New or select "<b>Get from Version Control"</b> From opening dialog box
@@ -32,11 +28,9 @@ Code setup
 * let the android studio install the components, 
 * Hurrraaaa you Just configure the project in android studio
 
-Device Setting
-* In order to connect you device with android studio you need to enable developer mode
-* For enabling developer mode and usb debug you may follow the device specific steps
-* you can follow the step described in link below to enable developer options and usb debugging
-* https://developer.android.com/studio/debug/dev-options
+To Download Chat Lib
+* Follow the link below and download “<b>norgic-chatsdk-v1.0.0.aar</b>” file
+* https://sdk.vdotok.com/Android-SDKs/
 
 Configure Lib
 * From Android Studio file menu click on File->New->New Module->Import .JAR/.AAR Package and click on next
@@ -58,3 +52,8 @@ Build Project
 * After running some automated commands and building gradle your app will install on you connected device
 * <img width="899" alt="Screenshot 2021-06-22 at 8 03 28 PM" src="https://user-images.githubusercontent.com/86282129/123636171-f9c16700-d835-11eb-8d22-cafb2b6ae4da.png">
 
+Device Setting
+* In order to connect you device with android studio you need to enable developer mode
+* For enabling developer mode and usb debug you may follow the device specific steps
+* you can follow the step described in link below to enable developer options and usb debugging
+* https://developer.android.com/studio/debug/dev-options
