@@ -355,20 +355,22 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     }
 
     override fun onNewMessage(message: Message) {
-        addLastMessageGroupToTop()
+        activity?.runOnUiThread {
+            addLastMessageGroupToTop()
 
-        if ((activity as DashboardActivity).mapUnreadCount.containsKey(message.to)) {
+            if ((activity as DashboardActivity).mapUnreadCount.containsKey(message.to)) {
 //            val count = (activity as DashboardActivity).mapUnreadCount[message.to]
 //            (activity as DashboardActivity).mapUnreadCount[message.to] = count?.plus(1) ?: 0
-            adapter.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
 
-        } else {
+            } else {
 //            (activity as DashboardActivity).mapUnreadCount[message.to] = 1
-            adapter.notifyDataSetChanged()
-        }
+                adapter.notifyDataSetChanged()
+            }
 //        adapter.notifyDataSetChanged()
 
-        sendAcknowledgeMsgToGroup(message)
+            sendAcknowledgeMsgToGroup(message)
+        }
     }
 
 
