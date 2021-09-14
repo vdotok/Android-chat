@@ -37,7 +37,7 @@ Configure Lib
 
 <img width="498" alt="No Devices" src="https://user-images.githubusercontent.com/86282129/123636395-41e08980-d836-11eb-8643-429d6e5510d5.png">
 
-* And then go to ChatApp -> app -> src -> build.gradle and past following line in Dependencies  section
+* And then go to ChatApp -> app -> build.gradle and past following line in Dependencies  section
 * “<b>implementation project(path: ':norgic-chatsdk-v1.0.0')</b>”
 * Click on “<b>sync now</b>” Button from top right corner
 <img width="765" alt="dependencie" src="https://user-images.githubusercontent.com/86282129/123636324-28d7d880-d836-11eb-8af3-8e06534eca4e.png">
