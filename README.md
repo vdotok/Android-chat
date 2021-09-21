@@ -30,10 +30,12 @@ Bravo! You’ve successfully configured the project in Android Studio.
 
 <b>Configure Lib:</b>
 * In <b> Android Studio File Explorer</b>, select <b>Project</b>
-  <img width="498" alt="123636395-41e08980-d836-11eb-8643-429d6e5510d5" src="https://user-images.githubusercontent.com/86282129/123811571-cb628b00-d90c-11eb-9584-b5a8f12957dc.png">
+<img width="498" alt="123636395-41e08980-d836-11eb-8643-429d6e5510d5" src="https://user-images.githubusercontent.com/86282129/123811571-cb628b00-d90c-11eb-9584-b5a8f12957dc.png">
 
 * Go to <b>VdoTok-Chat -> App -> libs</b>
 * Add the downloaded <b>norgic-chatsdk-v1.0.0.aar</b> file in the libs folder
+<img width="276" alt="MicrosoftTeams-image" src="https://user-images.githubusercontent.com/86282129/134177150-dab93ca7-3749-4599-83b8-30497022b5e6.png">
+
 
 <b>Project Signup and Project ID:</b>
 * Register for “Chat Server” at [VdoTok](https://userpanel.vdotok.com/signup) and get the <b>Project ID</b>
