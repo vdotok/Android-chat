@@ -44,23 +44,7 @@ object RetrofitBuilder {
             .create(ApiService::class.java)
     }
 
-    fun makeSdkAuthRetrofitService(context: Context): ApiService {
-        val interceptor = HttpLoggingInterceptor()
-        interceptor.level = HttpLoggingInterceptor.Level.BODY
 
-        val clientBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
-        clientBuilder.addInterceptor(interceptor)
-        setSSLCert(context, clientBuilder)
-
-        val client = clientBuilder.build()
-
-        return Retrofit.Builder()
-            .baseUrl(SDK_AUTH_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
-            .create(ApiService::class.java)
-    }
 
     private fun setSSLCert(context: Context, httpClient: OkHttpClient.Builder) {
         // Load CAs from an InputStream
