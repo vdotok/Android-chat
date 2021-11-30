@@ -1,5 +1,9 @@
 vdotok-Android-chat
 ===================
+Git Installation
+==============================
+* Please follow this [link](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) for GIT installation
+
 IDE Installation & Build Guide
 ==============================
 * Android Studio 4.1.2 or later (Stable Version)
