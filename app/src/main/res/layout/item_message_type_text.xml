@@ -7,7 +7,7 @@
 
         <import type="android.util.LayoutDirection" />
         <import type="android.view.View"/>
-        <import type="com.norgic.vdotokchat.utils.DateTimeUtilsKt" />
+        <import type="com.vdotok.chat.utils.DateTimeUtilsKt" />
         <import type="android.view.Gravity"/>
         <import type="androidx.constraintlayout.widget.Barrier" />
 
@@ -20,6 +20,13 @@
         <variable
             name="isSend"
             type="Boolean" />
+        <variable
+            name="count"
+            type="androidx.databinding.ObservableField&lt;String&gt;" />
+
+        <variable
+            name="model"
+            type="com.vdotok.connect.models.Message" />
 
         <variable
             name="progress_Chart"
@@ -58,6 +65,7 @@
                 style="@style/Theme_Text_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textIsSelectable="true"
                 android:layout_marginTop="10dp"
                 android:background="@{isSender ? @drawable/bg_message_send : @drawable/bg_message_recieved}"
                 android:gravity="start"
@@ -168,7 +176,7 @@
                 android:textSize="14sp"
                 android:textColor="@color/light_green"
                 android:visibility="@{seenMsg &amp;&amp; isSender? View.VISIBLE : View.GONE}"
-                android:text="@string/read"
+                android:text="@{String.format(@string/read,model.readCount)}"
                 android:gravity="end"
                 app:layout_constraintStart_toStartOf="@id/tv_time"
                 app:layout_constraintEnd_toEndOf="@id/tv_time"

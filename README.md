@@ -26,19 +26,19 @@ IDE Installation & Build Guide
 Bravo! You’ve successfully configured the project in Android Studio.
 
 <b>Download Call Lib:</b>
-* Go to: https://sdk.vdotok.com/Android-SDKs/ and download “<b>norgic-chatsdk-v1.0.0.aar</b>” file
+* Go to: https://sdk.vdotok.com/Android-SDKs/ and download “<b>connect.aar</b>” file
 
 <b>Configure Lib:</b>
 * In <b> Android Studio File Explorer</b>, select <b>Project</b>
 <img width="498" alt="123636395-41e08980-d836-11eb-8643-429d6e5510d5" src="https://user-images.githubusercontent.com/86282129/123811571-cb628b00-d90c-11eb-9584-b5a8f12957dc.png">
 
 * Go to <b>VdoTok-Chat -> App -> libs</b>
-* Add the downloaded <b>norgic-chatsdk-v1.0.0.aar</b> file in the libs folder
+* Add the downloaded <b>connect.aar</b> file in the libs folder
 <img width="276" alt="MicrosoftTeams-image" src="https://user-images.githubusercontent.com/86282129/134177150-dab93ca7-3749-4599-83b8-30497022b5e6.png">
 
 
 <b>Project Signup and Project ID:</b>
-* Register for “Chat Server” at [VdoTok](https://userpanel.vdotok.com/signup) and get the <b>Project ID</b>
+* Register for “Chat Server” at [VdoTok](https://console.vdotok.com) and get the <b>Project ID</b>
 * From file explorer, double-click on <b>vdotok-chat -> app -> src -> main -> java -> com -> norgic -> vdotokchat-> utils -> ApplicationConstants</b> replace <b>SDK_PROJECT_ID</b> with your own <b>Project Id</b>
 
 <b>Device Setting:</b>

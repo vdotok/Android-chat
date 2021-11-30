@@ -1,2 +1,3 @@
+include ':Network'
 include ':app'
 rootProject.name = "VdoTokChat"

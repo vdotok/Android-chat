@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.norgic.vdotokchat.ui.account.fragment.LoginFragment"
+        android:name="com.vdotok.chat.ui.account.fragment.LoginFragment"
         android:label="LoginFragment"
         tools:layout="@layout/layout_fragment_login">
 
@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.norgic.vdotokchat.ui.account.fragment.SignUpFragment"
+        android:name="com.vdotok.chat.ui.account.fragment.SignUpFragment"
         android:label="SignUpFragment"
         tools:layout="@layout/layout_fragment_signup">
 

@@ -8,7 +8,7 @@
 
         <variable
             name="groupModel"
-            type="com.norgic.vdotokchat.models.UserModel"/>
+            type="com.vdotok.network.models.UserModel"/>
 
     </data>
 

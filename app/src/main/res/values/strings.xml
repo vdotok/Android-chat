@@ -25,9 +25,9 @@
     <string name="status">Status</string>
     <string name="misread_message">Misread messages</string>
     <string name="no_user_select">No User Selected</string>
-    <string name="norgic">norgic</string>
+    <string name="Vdotok">Vdotok</string>
     <string name="confirm">Confirm</string>
-    <string name="read">Read</string>
+    <string name="read">Read %s</string>
     <string name="video_file">Video File</string>
     <string name="doc_file">Document File</string>
     <string name="audio_file">Audio File</string>
@@ -44,7 +44,7 @@
     <string name="register_text">Register with username and password.</string>
     <string name="create_user">Create a user</string>
     <string name="name_group_chat">Name your group chat</string>
-    <string name="group_name_hint">ex: Norgic Team</string>
+    <string name="group_name_hint">ex: Vdotok Team</string>
     <string name="done">Done</string>
     <string name="register_user">Register user</string>
     <string name="account_created_success">Account Created!</string>
@@ -63,6 +63,8 @@
     <string name="sign_up_to_your_account">Sign Up to your account</string>
     <string name="select_contact">Select Contact</string>
     <string name="blank" />
+    <string name="no_internet">No Internet Connection</string>
+
 
     <string name="in_progress">In progress!</string>
     <string name="attachment_failed">Attachment received failed</string>

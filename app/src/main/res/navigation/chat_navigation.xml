@@ -6,15 +6,15 @@
     app:startDestination="@id/inboxFragment">
     <fragment
         android:id="@+id/allUsersListFragment"
-        android:name="com.norgic.vdotokchat.ui.dashBoard.ui.AllUserListFragment"
+        android:name="com.vdotok.chat.ui.dashBoard.ui.AllUserListFragment"
         android:label="allUsersListFragment"
         tools:layout="@layout/layout_all_user_list">
 
         <action
             android:id="@+id/action_open_chat_fragment"
             app:destination="@id/chatFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
             app:popUpTo="@id/select_userList"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />
@@ -23,15 +23,15 @@
 
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.norgic.vdotokchat.ui.dashBoard.ui.ChatFragment"
+        android:name="com.vdotok.chat.ui.dashBoard.ui.ChatFragment"
         android:label="chatFragment"
         tools:layout="@layout/layout_chat_fragment">
 
         <action
             android:id="@+id/action_open_inbox_fragment"
             app:destination="@id/inboxFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
             app:popUpTo="@id/chatFragment"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />
@@ -40,54 +40,54 @@
 
     <fragment
         android:id="@+id/inboxFragment"
-        android:name="com.norgic.vdotokchat.ui.dashBoard.ui.AllGroupsFragment"
+        android:name="com.vdotok.chat.ui.dashBoard.ui.AllGroupsFragment"
         android:label="InboxFragment"
         tools:layout="@layout/layout_fragment_inbox">
 
         <action
             android:id="@+id/action_open_all_users_list_fragment"
             app:destination="@id/allUsersListFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />
 
         <action
             android:id="@+id/action_open_chat_fragment"
             app:destination="@id/chatFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />
 
         <action
             android:id="@+id/action_open_contact_fragment"
             app:destination="@id/select_userList"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />
     </fragment>
 
     <fragment
         android:id="@+id/select_userList"
-        android:name="com.norgic.vdotokchat.ui.dashBoard.ui.SelectContactFragment"
+        android:name="com.vdotok.chat.ui.dashBoard.ui.SelectContactFragment"
         android:label="SelectContactFragment"
         tools:layout="@layout/layout_select_contact">
 
         <action
             android:id="@+id/action_open_all_users_list_fragment"
             app:destination="@id/allUsersListFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />
 
         <action
             android:id="@+id/action_open_chat_fragment"
             app:destination="@id/chatFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            app:enterAnim="@anim/slide_item_from_right"
+            app:exitAnim="@anim/slide_item_to_left"
             app:popUpTo="@id/select_userList"
             app:popUpToInclusive="true"
             app:launchSingleTop="true" />

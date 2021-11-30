@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/VdoTokChat.iml" filepath="$PROJECT_DIR$/.idea/modules/VdoTokChat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Network/VdoTokChat.Network.iml" filepath="$PROJECT_DIR$/.idea/modules/Network/VdoTokChat.Network.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/VdoTokChat.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/VdoTokChat.app.iml" />
     </modules>
   </component>
