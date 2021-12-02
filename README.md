@@ -40,7 +40,7 @@ Bravo! You’ve successfully configured the project in Android Studio.
 * Add the downloaded <b>connect.aar</b> file in the libs folder
 <img width="276" alt="MicrosoftTeams-image" src="https://user-images.githubusercontent.com/86282129/134177150-dab93ca7-3749-4599-83b8-30497022b5e6.png">
 * After this "Sync Project with Gradle files"
-
+<img width="33" alt="Screenshot 2021-12-02 at 4 35 35 PM" src="https://user-images.githubusercontent.com/88875529/144414845-15345a83-c60d-4445-8f10-23e3dbb05ecd.png">
 
 <b>Project Signup and Project ID:</b>
 * Register for “Chat Server” at [VdoTok](https://console.vdotok.com) and get the <b>Project ID</b>
