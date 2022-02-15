@@ -38,8 +38,9 @@ Bravo! You’ve successfully configured the project in Android Studio.
 
 * Go to <b>VdoTok-Chat -> App -> libs</b>
 * Add the downloaded <b>connect.aar</b> file in the libs folder
-<img width="276" alt="MicrosoftTeams-image" src="https://user-images.githubusercontent.com/86282129/134177150-dab93ca7-3749-4599-83b8-30497022b5e6.png">
-
+<img width="243" alt="Screenshot 2021-12-02 at 4 51 28 PM" src="https://user-images.githubusercontent.com/88875529/144416883-ceac6a20-99e6-4085-ae79-3d2ca746fb7b.png">
+<li> After this click on gradle sync icon from the toolbar
+<img width="21" alt="Screenshot 2021-12-02 at 4 43 51 PM" src="https://user-images.githubusercontent.com/88875529/144415902-78883f01-f5be-4f99-a6e3-d9ea44a71936.png"> to sync project.</li></br>
 
 <b>Project Signup and Project ID:</b>
 * Register for “Chat Server” at [VdoTok](https://console.vdotok.com) and get the <b>Project ID</b>
