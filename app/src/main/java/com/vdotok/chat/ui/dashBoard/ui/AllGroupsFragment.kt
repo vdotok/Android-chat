@@ -1,6 +1,8 @@
 package com.vdotok.chat.ui.dashBoard.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -365,7 +367,6 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     }
 
     override fun attachmentReceivedFailed() {
-
     }
 
     override fun onReceiptReceived(model: ReadReceiptModel) {
@@ -402,9 +403,11 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
 
 
     private fun doSubscribe() {
-        for (group in dataSet) {
-            cManger.subscribeTopic(group.channelKey, group.channelName)
-        }
+        Handler(Looper.getMainLooper()).postDelayed({
+            for (group in dataSet) {
+                cManger.subscribeTopic(group.channelKey, group.channelName)
+            }
+        },2000)
     }
 
     private fun showDeleteGroupDialog(groupId: Int) {
