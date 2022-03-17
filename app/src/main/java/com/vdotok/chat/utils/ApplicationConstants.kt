@@ -7,20 +7,9 @@ package com.vdotok.chat.utils
  */
 object ApplicationConstants {
 
-    const val API_BASE_URL: String = "https://stenant.vdotok.dev/"
-    const val SDK_AUTH_BASE_URL: String = "https://vtkapi.vdotok.com/"
-
     //    SDK AUTH PARAMS
     const val SDK_API_KEY: String = "3d9686b635b15b5bc2d19800407609fa"
     const val PROJECT_ID: String = "Enter your Project Id here"
-
-//    /*********************** DEV URLs *************************/
-//    const val API_BASE_URL: String = "https://tenant-api.vdotok.dev/"
-//    const val SDK_AUTH_BASE_URL: String = "https://vtkapi.vdotok.com/"
-//
-////    SDK AUTH PARAMS
-//    const val SDK_API_KEY: String = "3d9686b635b15b5bc2d19800407609fa"
-//    const val PROJECT_ID: String = "125YLEY1"
 
 //    Prefs constants
     const val SOCKET_CONNECTION = "SOCKET_CONNECTION"
