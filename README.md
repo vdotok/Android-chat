@@ -42,7 +42,7 @@ Bravo! You’ve successfully configured the project in Android Studio.
 <img width="21" alt="Screenshot 2021-12-02 at 4 43 51 PM" src="https://user-images.githubusercontent.com/88875529/144415902-78883f01-f5be-4f99-a6e3-d9ea44a71936.png"> to sync project.</li></br>
 
 <b>Project Signup:</b>
-* Register your Account at [VdoTok](https://www.vdotok.com/) and after creating an account [Login](https://console.vdotok.com/) to get the <b>Project ID</b> and <b>API Service URL</b>
+* Register your account on [VdoTok](https://www.vdotok.com/). After creating an account, [login](https://console.vdotok.com/) to get the <b>Project ID</b> and <b>API Service URL</b>
 * From file explorer, double-click on <b>vdotok-chat -> app -> src -> main -> java -> com -> vdotok -> chat -> utils -> ApplicationConstants</b> replace <b>SDK_PROJECT_ID</b> with your own <b>Project Id</b>
 * From file explorer, double-click on <b>vdotok-chat -> Network -> src -> main -> java -> com ->vdotok -> network -> utils -> Constants</b> replace <b>BASE_URL</b> with your own <b>API Service URL</b>
 
