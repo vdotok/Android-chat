@@ -11,7 +11,7 @@ IDE Installation & Build Guide
 
 <b>Code setup:</b>
 * Open <b>Android Studio</b>
-* Click on <b>Get from Version Control</b> or in case the welcome page doesn't open, go to <b>File Menu->New</b> and select <b>Project From Version Control</b>
+* Click on <b>Get from Version Control</b> or in case the Welcome page doesn't open, go to <b>File Menu->New</b> and select <b>Project From Version Control</b>
 * Select <b>Repository URL</b> from left menu
 * Select <b>Git</b> from <b>Version control</b> dropdown menu
 * Paste this URL https://github.com/vdotok/Android-chat.git in URL section
