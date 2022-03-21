@@ -49,10 +49,7 @@ Bravo! You’ve successfully configured the project in Android Studio.
 <b>Device Setting:</b>
 * To connect a device, enable <b>“developer mode”</b> and <b>“USB debugging”</b> by following the device-specific steps provided [here.](https://developer.android.com/studio/debug/dev-options)
 * Some devices need <b>“Install Via USB”</b> option below the <b>“USB debugging”</b> settings to be enabled in order to install the application in the device via USB.
-
-<b>Note:</b> 
-* Some devices e.g. Redmi devices need a Mi account to enable these settings or the installtion will be failed with the error.
-<img width="760" alt="Screenshot 2022-03-21 at 11 19 14 AM" src="https://user-images.githubusercontent.com/88875529/159213289-892e4974-c676-43c1-a7fa-aad627b5ff8e.png">
+* [Click here](https://support.mobiledit.com/portal/en/kb/articles/how-to-enable-usb-debugging) for additional device specific settings.
 
 
 <b>Build Project:</b>
