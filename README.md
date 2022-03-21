@@ -49,7 +49,7 @@ Bravo! You’ve successfully configured the project in Android Studio.
 <b>Device Setting:</b>
 * To connect a device, enable <b>“developer mode”</b> and <b>“USB debugging”</b> by following the device-specific steps provided [here.](https://developer.android.com/studio/debug/dev-options)
 * Some devices need <b>“Install Via USB”</b> option below the <b>“USB debugging”</b> settings to be enabled in order to install the application in the device via USB.
-* [Click here](https://support.mobiledit.com/portal/en/kb/articles/how-to-enable-usb-debugging) for additional device specific settings.
+* Click [here](https://support.mobiledit.com/portal/en/kb/articles/how-to-enable-usb-debugging) for additional device specific settings.
 
 
 <b>Build Project:</b>
