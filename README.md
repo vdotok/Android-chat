@@ -23,7 +23,7 @@ IDE Installation & Build Guide
 
 Bravo! You’ve successfully configured the project in Android Studio.
 
-<b>Download Call Lib:</b>
+<b>Download Connect Lib:</b>
 * Go to: https://sdk.vdotok.com/Android-SDKs/ and download “<b>connect.aar</b>” file
 
 <b>Configure Lib:</b>
@@ -33,8 +33,7 @@ Bravo! You’ve successfully configured the project in Android Studio.
 * Go to <b>VdoTok-Chat -> App -> libs</b>
 * Add the downloaded <b>connect.aar</b> file in the libs folder
 <img width="243" alt="Screenshot 2021-12-02 at 4 51 28 PM" src="https://user-images.githubusercontent.com/88875529/144416883-ceac6a20-99e6-4085-ae79-3d2ca746fb7b.png">
-<li> After this, click on gradle sync icon from the toolbar
-<img width="21" alt="Screenshot 2021-12-02 at 4 43 51 PM" src="https://user-images.githubusercontent.com/88875529/144415902-78883f01-f5be-4f99-a6e3-d9ea44a71936.png"> to sync project.</li></br>
+<li> After this, click on gradle sync icon <img width="21" alt="Screenshot 2021-12-02 at 4 43 51 PM" src="https://user-images.githubusercontent.com/88875529/144415902-78883f01-f5be-4f99-a6e3-d9ea44a71936.png"> from the toolbar to sync project.</li></br>
 
 <b>Project Signup:</b>
 * Register your account on [VdoTok](https://www.vdotok.com/). After creating an account, [login](https://console.vdotok.com/) to get the <b>Project ID</b> and <b>API Service URL</b>
@@ -49,7 +48,7 @@ Bravo! You’ve successfully configured the project in Android Studio.
 
 <b>Build Project:</b>
 * Connect your phone with system in a <b>File-sharing Mode</b>
-* You can find your phone name in running devices list, as described in the below image
+* You can find your phone name in <b>running devices</b> list, as described in the below image
 * Select your device and click on <b>Play</b> button<img width="24" alt="Screenshot 2021-09-21 at 1 19 15 PM" src="https://user-images.githubusercontent.com/86282129/134136764-72c0f47e-6ecb-4c62-a562-804b68042fe5.png">
 * After running some automated commands and building gradle, your app will be installed on your connected device
   <img width="1012" alt="Screenshot 2021-06-29 at 6 59 36 PM" src="https://user-images.githubusercontent.com/86282129/123811062-5bec9b80-d90c-11eb-96e1-ee50dee125c5.png">
