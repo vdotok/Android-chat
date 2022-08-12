@@ -155,15 +155,17 @@ class ChatListAdapter(
 
     fun updateMessageForReceipt(model: ReadReceiptModel) {
 
-        val item = items.first { it.id == model.messageId }
+        val item = items.firstOrNull { it.id == model.messageId }
         val position = items.indexOf(item)
 
         if(model.receiptType == ReceiptType.SEEN.value){
-            item.status = model.receiptType
-            item.readCount = item.readCount + 1
-            items[position] = item
+            item?.status = model.receiptType
+            item?.readCount = item?.readCount?.plus(1) ?: 0
 
-            callBack.onRecieptReceive(item)
+            item?.let {
+                items[position] = item
+                callBack.onRecieptReceive(it)
+            }
 //            notifyDataSetChanged()
             notifyItemChanged(position)
         }
@@ -182,6 +184,7 @@ class ChatListAdapter(
 
 
     }
+
 
     override fun getItemId(position: Int): Long {
         return position.toLong()
