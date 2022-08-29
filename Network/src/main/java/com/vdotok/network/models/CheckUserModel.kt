@@ -18,5 +18,5 @@ data class CheckUserModel (
     var email: String? = null,
 
     @SerializedName("project_id")
-    var projectId: String
+    var projectId: String? = null
 ) : Parcelable
