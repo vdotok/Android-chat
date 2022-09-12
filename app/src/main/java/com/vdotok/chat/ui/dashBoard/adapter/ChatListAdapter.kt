@@ -198,7 +198,6 @@ class ChatListAdapter(
         item.date = System.currentTimeMillis()
         items.add(item)
         notifyItemInserted(itemCount - 1)
-        notifyItemInserted(itemCount)
     }
 
 }

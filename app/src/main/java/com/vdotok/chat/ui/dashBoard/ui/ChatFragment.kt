@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.databinding.ObservableBoolean
 import androidx.databinding.ObservableField
 import com.vdotok.connect.models.*
@@ -747,9 +748,16 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     private fun deleteTempFile() {
         val resolver = activity?.applicationContext?.contentResolver
         tempUriToDeleteAfterSendFileComplete?.let {
-            val result: Int? = resolver?.delete(it, null, null)
-            if (result != null && result > 0) {
-                Log.d("Tag", "File deleted")
+            val file = File(it.toString())
+            if (file.exists()) {
+                try {
+                    val imageUri: Uri = FileProvider.getUriForFile(
+                        requireContext(), requireContext().packageName.toString() + ".provider", file
+                    )
+                    val result = resolver?.delete(imageUri, null, null)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
