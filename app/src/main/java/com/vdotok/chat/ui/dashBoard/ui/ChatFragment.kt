@@ -745,6 +745,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
         }
     }
 
+
     private fun deleteTempFile() {
         val resolver = activity?.applicationContext?.contentResolver
         tempUriToDeleteAfterSendFileComplete?.let {
