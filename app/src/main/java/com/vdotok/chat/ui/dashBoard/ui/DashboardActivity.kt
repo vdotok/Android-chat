@@ -29,6 +29,9 @@ import com.vdotok.connect.manager.ChatManagerCallback
 import com.vdotok.connect.models.Message
 import com.vdotok.connect.models.Presence
 import com.vdotok.network.models.GroupModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 
@@ -66,6 +69,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
         init()
 //        addInternetConnectionObserver()
 
+
     }
 
     private fun askForPermissions() {
@@ -101,6 +105,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
     private fun connect() {
         prefs.mConnection?.let {
+//            it.host = "ssl://".plus(it.host)
             it.interval = 5
             chatManger?.connect(it)
         }
@@ -171,27 +176,28 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
      * @param message message object we will be sending to the server
      * */
      fun updateMessageMapData(message: Message) {
-        if (mapGroupMessages.containsKey(message.to)) {
-            val messageValue: ArrayList<Message> = mapGroupMessages[message.to] as ArrayList<Message>
-            val check = messageValue.any { it.id == message.id }
-            if (!check){
+            if (mapGroupMessages.containsKey(message.to)) {
+                val messageValue: ArrayList<Message> =
+                    mapGroupMessages[message.to] as ArrayList<Message>
+                val check = messageValue.any { it.id == message.id }
+                if (!check) {
+                    messageValue.add(message)
+                    mapGroupMessages[message.to] = messageValue
+                    mapLastMessage[message.to] = messageValue
+                } else {
+                    val list = mapGroupMessages[message.to] as ArrayList<Message>
+                    val oldValue = list.firstOrNull { it.id == message.id }
+                    list[list.indexOf(oldValue)] = message
+                    mapGroupMessages[message.to] = list
+                }
+
+
+            } else {
+                val messageValue: ArrayList<Message> = ArrayList()
                 messageValue.add(message)
                 mapGroupMessages[message.to] = messageValue
                 mapLastMessage[message.to] = messageValue
-            } else {
-                val list = mapGroupMessages[message.to] as ArrayList<Message>
-                val oldValue = list.filter { it.id == message.id}.first()
-                list[list.indexOf(oldValue)] = message
-                mapGroupMessages[message.to] = list
             }
-
-
-        } else {
-            val messageValue: ArrayList<Message> = ArrayList()
-            messageValue.add(message)
-            mapGroupMessages[message.to] = messageValue
-            mapLastMessage[message.to] = messageValue
-        }
     }
 
 
@@ -262,8 +268,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
         Log.e("Connection Status", "Connected")
         isSocketConnected.set(true)
             mListener?.onConnectionSuccess()
-//        binding.root.showSnackBar(R.string.sdk_connected)
-//        doSubscribe()
+
     }
 
     /**
@@ -289,9 +294,12 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
         byteArray: ByteArray,
         msgId: String
     ) {
-        checkAndroidVersionToSave(headerModel, byteArray)
-        sendAttachmentMessage(headerModel, file, msgId)
-
+       runOnUiThread {
+           checkAndroidVersionToSave(headerModel, byteArray)
+           file?.let {
+               sendAttachmentMessage(headerModel,it, msgId)
+           }
+       }
     }
 
     override fun onFileReceivingFailed() {
@@ -299,7 +307,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     }
 
     override fun onFileReceivingProgressChanged(fileHeaderId: String, progress: Int) {
-//        TODO("Not yet implemented")
+        mListener?.attachmentProgressReceive(fileHeaderId, progress)
     }
 
     override fun onFileReceivingStarted(fileHeaderId: String) {
@@ -312,7 +320,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
 
     override fun onFileSendingFailed(headerId: String) {
-//        TODO("Not yet implemented")
+        mListener?.attachmentSendingFailed(headerId)
     }
 
     override fun onFileSendingProgressChanged(fileHeaderId: String, progress: Int) {
@@ -356,8 +364,8 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     override fun onPresenceReceived(who: ArrayList<Presence>) {
         runOnUiThread {
             saveUpdatePresenceList(who)
+            mListener?.onPresence(who)
         }
-        mListener?.onPresence(who)
     }
 
     /**
@@ -365,23 +373,27 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
      * @param model is the object received and will be used to view acknowledgement for a message
      * */
     override fun onReceiptReceived(model: ReadReceiptModel) {
-        mListener?.onReceiptReceived(model)
+        runOnUiThread {
+            mListener?.onReceiptReceived(model)
+        }
     }
 
     /**
      * Callback method when user receives a message
      * @param myMessage message object we will be sending to the server
      * */
+
+    @Synchronized
     override fun onMessageArrived(myMessage: Message) {
+      runOnUiThread {
+            lastMessageGroupKey = myMessage.key
+            myMessage.to.let {
+                mapUnreadCount[it] = mapUnreadCount[it]?.plus(1) ?: 1
+            }
+            updateMessageMapData(myMessage)
+            mListener?.onNewMessage(myMessage)
 
-        lastMessageGroupKey = myMessage.key
-
-        myMessage.to.let {
-            mapUnreadCount[it] = mapUnreadCount[it]?.plus(1) ?: 1
         }
-
-        mListener?.onNewMessage(myMessage)
-        updateMessageMapData(myMessage)
     }
 
     /**
@@ -407,7 +419,6 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 //    }
 
     fun sendAttachmentMessage(headerModel: HeaderModel, files: File?, msgId: String) {
-
         savedSubscribedGroupList.let { item ->
             item.forEach {
                 if (it.channelName == headerModel.topic) {
@@ -469,29 +480,33 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
             when (headerModel.type) {
                 MediaType.IMAGE.value -> SaveImage(
                         byteArray,
-                        "${System.currentTimeMillis()}",
-                        "image/jpeg",
+                    System.currentTimeMillis().toString().plus(".")
+                        .plus(headerModel.fileExtension),
+                        "image/${headerModel.fileExtension}",
                         "${Environment.DIRECTORY_PICTURES}/$directoryName",
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 )
                 MediaType.VIDEO.value -> SaveImage(
                         byteArray,
-                        "${System.currentTimeMillis()}",
-                        "video/mp4",
+                    System.currentTimeMillis().toString().plus(".")
+                        .plus(headerModel.fileExtension),
+                        "video/${headerModel.fileExtension}",
                         "${Environment.DIRECTORY_MOVIES}/$directoryName",
                         MediaStore.Video.Media.EXTERNAL_CONTENT_URI
                 )
                 MediaType.AUDIO.value -> SaveImage(
                         byteArray,
-                        "${System.currentTimeMillis()}",
-                        "audio/x-wav",
+                     System.currentTimeMillis().toString().plus(".")
+                        .plus(headerModel.fileExtension),
+                        "audio/${headerModel.fileExtension}",
                         "${Environment.DIRECTORY_MUSIC}/$directoryName",
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
                 )
                 MediaType.FILE.value -> SaveImage(
                         byteArray,
-                        "${System.currentTimeMillis()}",
-                        "application/pdf",
+                    System.currentTimeMillis().toString().plus(".")
+                        .plus(headerModel.fileExtension),
+                        "application/${headerModel.fileExtension}",
                         "${Environment.DIRECTORY_DOCUMENTS}/$directoryName",
                         MediaStore.Files.getContentUri(
                                 "external"
@@ -509,22 +524,6 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
     }
 
-    //    private fun addInternetConnectionObserver() {
-//        myLiveData = NetworkStatusLiveData(this.application)
-//
-//        myLiveData.observe(this, { isInternetConnected ->
-//            when {
-//                isInternetConnected == true && internetConnectionRestored -> {
-////                    connect()
-//                    mListener?.sub()
-//                }
-//                else -> {
-//                    internetConnectionRestored = true
-//                    Log.e("net","disconnect")
-//                }
-//            }
-//        })
-//    }
 
     fun makeFileModel(
             file: File?,
@@ -588,7 +587,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
             contentUri: Uri
     ) {
 
-        val resol = this?.applicationContext?.contentResolver
+        val resol = this.applicationContext?.contentResolver
         val contentValu = ContentValues()
         contentValu.put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
         contentValu.put(MediaStore.MediaColumns.MIME_TYPE, mimeType)
@@ -596,18 +595,14 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
         val imageurl = resol?.insert(contentUri, contentValu)
 
-        val parcelFileDescriptor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            this?.applicationContext?.contentResolver?.openFileDescriptor(imageurl!!, "w", null)
-        } else {
-            TODO("VERSION.SDK_INT < KITKAT")
-        }
+        val parcelFileDescriptor = this.applicationContext?.contentResolver?.openFileDescriptor(imageurl!!, "w", null)
 
         val fileOutputStream = FileOutputStream(parcelFileDescriptor!!.fileDescriptor)
         fileOutputStream.write(bytes)
         fileOutputStream.close()
         imageurl?.let { uri ->
             this?.applicationContext?.let { context ->
-                file = File(ImageUtils.copyFileToInternalStorage(context, uri, directoryName))
+                file = File(ImageUtils.copyFileToInternalStorage(context, uri, directoryName)!!)
                 contentValu.clear()
                 this?.applicationContext?.contentResolver?.update(uri, contentValu, null, null)
 

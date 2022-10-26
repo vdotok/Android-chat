@@ -29,10 +29,10 @@ object ApplicationConstants {
     const val CHUNK_SIZE = 4000// 12kb
 
     //    File paths
-    const val IMAGES_DIRECTORY = "/cPass/images"
-    const val VIDEO_DIRECTORY = "/cPass/videos"
-    const val AUDIO_DIRECTORY = "/cPass/audios"
-    const val DOCS_DIRECTORY = "/cPass/docs"
+    const val IMAGES_DIRECTORY = "/Vdotok-chat/images"
+    const val VIDEO_DIRECTORY = "/Vdotok-chat/videos"
+    const val AUDIO_DIRECTORY = "/Vdotok-chat/audios"
+    const val DOCS_DIRECTORY = "/Vdotok-chat/docs"
 
 //    API ERROR LOG TAGS
     const val API_ERROR = "API_ERROR"

@@ -7,6 +7,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="false"
     android:background="@color/light_gray_new">
 
     <include
@@ -16,16 +17,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ProgressBar
+    <com.daimajia.numberprogressbar.NumberProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="5dp"
+        app:progress_max="100"
+        app:progress_current="0"
         android:visibility="gone"
-        android:elevation="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        style="@style/NumberProgressBar_Funny_Orange"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        app:progress_reached_bar_height="5.0dp"
+        app:progress_unreached_bar_height="4.25dp"
+        app:progress_reached_color="@color/teal_700"
+        app:progress_unreached_color="@color/grey"
+        android:textSize="12sp"
+        app:progress_text_offset="2dp"
+        app:progress_text_color="@color/black"
+        app:layout_constraintTop_toBottomOf="@+id/rcv_msg_list"
+        app:layout_constraintBottom_toTopOf="@+id/chat_input_layout"
+        app:layout_constraintEnd_toEndOf="@id/rcv_msg_list"
+        app:layout_constraintStart_toStartOf="@id/rcv_msg_list" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_msg_list"
@@ -34,8 +47,9 @@
         android:layout_margin="5dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:itemCount="5"
+        android:animateLayoutChanges="false"
         tools:listitem="@layout/item_message_type_text"
-        app:layout_constraintBottom_toTopOf="@id/chat_input_layout"
+        app:layout_constraintBottom_toTopOf="@id/progressBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chat_toolbar" />

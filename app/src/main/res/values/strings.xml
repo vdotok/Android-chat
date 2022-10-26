@@ -27,7 +27,7 @@
     <string name="no_user_select">No User Selected</string>
     <string name="Vdotok">Vdotok</string>
     <string name="confirm">Confirm</string>
-    <string name="read">Read %s</string>
+    <string name="read">Read</string>
     <string name="video_file">Video File</string>
     <string name="doc_file">Document File</string>
     <string name="audio_file">Audio File</string>

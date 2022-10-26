@@ -1,15 +1,13 @@
 package com.vdotok.chat.ui.dashBoard.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.CountDownTimer
-import android.os.Environment
+import android.os.*
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
@@ -36,10 +34,17 @@ import com.vdotok.chat.utils.ImageUtils.encodeToBase64
 import com.vdotok.connect.manager.ChatManager
 import com.vdotok.connect.models.Message
 import com.vdotok.network.models.GroupModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.timerTask
+import androidx.recyclerview.widget.LinearSmoothScroller
+
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SmoothScroller
 
 
 /**
@@ -88,18 +93,19 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
         if (listOfChunks.isNotEmpty())
             listOfChunks.clear()
 
-
         return binding.root
     }
 
     private fun initUserListAdapter() {
         activity?.applicationContext?.let {
-            adapter = ChatListAdapter(it, this, loginUserRefId, getSaveChat(), this, {}){
-                sendAcknowledgeMsgToGroup(it)
-            }
+            adapter = ChatListAdapter(it, this, loginUserRefId, getSaveChat(), this)
             adapter.setHasStableIds(true)
+            binding.rcvMsgList.setHasFixedSize(true)
             binding.rcvMsgList.adapter = adapter
-            scrollToLast()
+            binding.rcvMsgList.addOnLayoutChangeListener { v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom -> if (bottom < oldBottom) scrollToLast() }
+            Handler(Looper.getMainLooper()).postDelayed({
+                scrollToLast()
+            },1000)
         }
     }
 
@@ -173,7 +179,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
 
         binding.chatInputLayout.imgSend.setOnClickListener {
             if (getMessageCheck(mMessageText)) {
-                sendTextMessage()
+                    sendTextMessage()
             }
         }
 
@@ -235,8 +241,6 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
      * */
     private fun handleAfterTextChange(text: String) {
 
-        //setSendButtonState(text)
-
         if(text.isNotEmpty()){
             sendTypingMessage(loginUserRefId, true)
 
@@ -263,25 +267,29 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     /**
      * Function to send message upon clicking send button
      * */
+    @SuppressLint("NewApi")
+    @Synchronized
     private fun sendTextMessage() {
         val text = mMessageText.get().toString()
         groupModel?.let {
-            if(text.isNotEmpty()){
-                val chatModel = Message(
-                    System.currentTimeMillis().toString(),
-                    it.channelName,
-                    it.channelKey,
-                    loginUserRefId,
-                    MessageType.text,
-                    text.trim(),
-                    0f,
-                    getIsGroupMessage(),
-                    ReceiptType.SENT.value
-                )
-                cManger?.publishMessage(chatModel)
-                mMessageText.set("")
+                if (text.isNotEmpty()) {
+                    val chatModel = Message(
+                       UUID.randomUUID().toString(),
+                        it.channelName,
+                        it.channelKey,
+                        loginUserRefId,
+                        MessageType.text,
+                        text.trim(),
+                        0f,
+                        getIsGroupMessage(),
+                        ReceiptType.SENT.value
+                    )
+                    CoroutineScope(Dispatchers.Default).launch {
+                        cManger?.publishMessage(chatModel)
+                    }
+                    mMessageText.set("")
+                }
             }
-        }
     }
 
     private fun getIsGroupMessage(): Boolean {
@@ -335,9 +343,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     private fun selectImage() {
         val pickPhoto = Intent(
             Intent.ACTION_GET_CONTENT,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         pickPhoto.type = "image/*"
         pickPhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         pickPhoto.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
@@ -347,9 +353,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     private fun selectAudio() {
         val pickAudio = Intent(
             Intent.ACTION_GET_CONTENT,
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        )
-
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
         pickAudio.type = "audio/*"
         pickAudio.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         pickAudio.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
@@ -359,9 +363,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     private fun selectVideo() {
         val pickVideo = Intent(
             Intent.ACTION_GET_CONTENT,
-            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        )
-
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
         pickVideo.type = "video/*"
         pickVideo.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         pickVideo.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
@@ -393,8 +395,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if(resultCode == Activity.RESULT_OK){
+        if(resultCode == Activity.RESULT_OK) {
 
             when (requestCode) {
                 REQUEST_CODE_GALLERY -> {
@@ -417,7 +418,6 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
             groupModel?.let {
                 cManger?.sendFileToGroup(it.channelKey, it.channelName, selectedFile, fileType)
             }
-
         }
     }
 
@@ -439,7 +439,6 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
 
 
     private fun handleSelectionFromGallery(data: Intent?) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             activity?.applicationContext?.let { context->
                 val byteArray = ImageUtils.convertImageToByte(context, Uri.parse(data?.data.toString()))
@@ -453,9 +452,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
                 )
             }
         } else {
-
             file = getFileData(activity as Context, data?.data, MediaType.IMAGE)
-
         }
 
         selectedFile = file
@@ -514,7 +511,6 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
 
 
     private fun handleSelectionFromCamera(data: Intent?) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             activity?.applicationContext?.let { context->
                 val byteArray = ImageUtils.convertBitmapToByteArray(
@@ -571,11 +567,10 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
      * @param isTyping Boolean object to inform a user has started typing
      * */
     private fun sendTypingMessage(userName: String, isTyping: Boolean) {
-
         groupModel?.let {
             val content = if(isTyping) TYPING_START else TYPING_STOP
             val chatModel = Message(
-                System.currentTimeMillis().toString(),
+                UUID.randomUUID().toString(),
                 it.channelName,
                 it.channelKey,
                 userName,
@@ -600,16 +595,15 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun onNewMessage(message: Message) {
-        activity?.runOnUiThread {
+     activity?.runOnUiThread {
             if (message.key == groupModel?.channelKey) {
                 (activity as DashboardActivity).mapUnreadCount.clear()
-                binding.progressBar.hide()
                 usersList.clear()
                 adapter.addItem(message)
+                binding.progressBar.hide()
                 sendAcknowledgeMsgToGroup(message)
                 scrollToLast()
-            }
-            else {
+            } else {
                 AllGroupsFragment.messageUpdateLiveData.postValue(message)
             }
         }
@@ -628,9 +622,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun sendAttachment(msgId: String, fileType: Int) {
-
-        activity?.runOnUiThread {
-
+       activity?.runOnUiThread {
             val activityInstance = (activity as DashboardActivity)
             groupModel?.let { groupModel ->
                 adapter.isSend = true
@@ -649,7 +641,6 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun recieveAttachment(msgId: String) {
-//        Toast.makeText(activity, "this", Toast.LENGTH_SHORT).show()
 
     }
 
@@ -658,37 +649,46 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     }
 
     override fun attachmentProgress(msgId: String, progress: Int) {
-//        adapter.progress = progress.toFloat()
-        if (progress == 100) {
-            activity?.runOnUiThread {
-                val itemObject =  adapter.items.find { it.id == msgId }
-                val index = adapter.items.indexOf(itemObject)
-                adapter.isSend = false
-//                adapter.updateData(progress,index)
-                adapter.notifyItemChanged(index)
-//
-//
+        activity?.runOnUiThread {
+            binding.progressBar.show()
+            binding.progressBar.progress = progress
+            if (binding.progressBar.progress == 100){
+                binding.progressBar.hide()
             }
         }
+    }
 
-
+    override fun attachmentProgressReceive(msgId: String, progress: Int) {
+        activity?.runOnUiThread {
+            binding.progressBar.show()
+            binding.progressBar.progress = progress
+        }
     }
 
     override fun attachmentReceivedFailed() {
+        if (binding.progressBar.visibility == View.VISIBLE){
+            binding.progressBar.hide()
+        }
         binding.root.showSnackBar(R.string.attachment_failed)
 
     }
 
+    override fun attachmentSendingFailed(headerId: String) {
+        if (binding.progressBar.visibility == View.VISIBLE){
+            binding.progressBar.hide()
+        }
+        binding.root.showSnackBar("Attachment Sending Failed")
+    }
+
     override fun onReceiptReceived(model: ReadReceiptModel) {
         activity?.runOnUiThread {
-            if((model.from != loginUserRefId))
+            if ((model.from != loginUserRefId))
                 adapter.updateMessageForReceipt(model)
         }
     }
 
     override fun onBytesArrayReceived(payload: ByteArray?) {
         activity?.runOnUiThread {
-
             payload?.let {
                 val model = Message(
                     System.currentTimeMillis().toString(),
@@ -698,8 +698,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
                     MessageType.media,
                     encodeToBase64(it),
                     0f,
-                    getIsGroupMessage()
-                )
+                    getIsGroupMessage())
                 adapter.addItem(model)
             }
         }
@@ -770,7 +769,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
     /** function to handle sending acknowledgment message to the group that the message is received and seen
      * @param myMessage MqttMessage object containing details sent for the acknowledgment in group
      * */
-    private fun sendAcknowledgeMsgToGroup(myMessage: Message) {
+    fun sendAcknowledgeMsgToGroup(myMessage: Message) {
         myMessage.status = ReceiptType.SEEN.value
         if(myMessage.from != loginUserRefId) {
             val receipt = ReadReceiptModel(
@@ -781,7 +780,6 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
                 loginUserRefId,
                 myMessage.to
             )
-
             cManger?.publishPacketMessage(receipt, receipt.key, receipt.to)
         }
     }
@@ -792,36 +790,11 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
      * */
     private fun showOnTypingMessage(message: Message) {
         if(message.content == TYPING_START) {
-            //binding.chatToolbar.status.show()
                 message.from = getUserName(message)
                 showTypingText.set(true)
                 typingText.set(getNameOfUsers(message))
                 hideTypingText()
             }
-
-    }
-
-    private fun openFolder() {
-        val intent = Intent(Intent.ACTION_VIEW)
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-            intent.setDataAndType(
-                Uri.parse(
-                    Environment.getExternalStorageDirectory().toString()
-                            + File.separator + "cPass" + File.separator
-                ), "*/*"
-            )
-
-            activity?.startActivity(Intent.createChooser(intent, "Complete action using"))
-        } else {
-
-            intent.setDataAndType(
-                Uri.parse(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI.toString()
-                            + File.separator + "cPass" + File.separator
-                ), "*/*"
-            )
-            activity?.startActivity(Intent.createChooser(intent, "Open folder"))
-        }
 
     }
 
@@ -857,12 +830,10 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
         }
     }
 
-    override fun onFileClick() {
-        openFolder()
-    }
-
     override fun onRecieptReceive(message: Message) {
-        (activity as DashboardActivity).updateMessageMapData(message)
+        activity?.runOnUiThread {
+            (activity as DashboardActivity).updateMessageMapData(message)
+        }
     }
 
 }

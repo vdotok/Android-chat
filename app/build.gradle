@@ -77,8 +77,12 @@ dependencies {
 
     //Coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3'
+    implementation 'com.daimajia.numberprogressbar:library:1.4@aar'
 
     implementation project(path: ':Network')
+
+    implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
+    implementation 'com.android.support:multidex:1.0.3'
 
     // Lifecycle Component
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
