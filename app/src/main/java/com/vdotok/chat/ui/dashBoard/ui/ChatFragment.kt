@@ -98,7 +98,7 @@ class ChatFragment: ChatMangerListenerFragment(), OnMediaItemClickCallbackListne
 
     private fun initUserListAdapter() {
         activity?.applicationContext?.let {
-            adapter = ChatListAdapter(it, this, loginUserRefId, getSaveChat(), this)
+            adapter = ChatListAdapter(it, this, loginUserRefId, getSaveChat(), groupModel, this)
             adapter.setHasStableIds(true)
             binding.rcvMsgList.setHasFixedSize(true)
             binding.rcvMsgList.adapter = adapter

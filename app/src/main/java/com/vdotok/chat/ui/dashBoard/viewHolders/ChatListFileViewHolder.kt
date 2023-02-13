@@ -13,6 +13,7 @@ import com.vdotok.chat.databinding.ItemChatTextBinding
 import com.vdotok.connect.models.Message
 import com.vdotok.connect.models.ReceiptType
 import com.vdotok.connect.utils.ImageUtils
+import com.vdotok.network.models.GroupModel
 import java.io.File
 
 class ChatListFileViewHolder(private val  binding : ItemChatFileBinding):  RecyclerView.ViewHolder(binding.root){
@@ -23,7 +24,8 @@ class ChatListFileViewHolder(private val  binding : ItemChatFileBinding):  Recyc
         unreadMessage: (Message) -> Unit,
         ownUserName: String,
         otherUser: String,
-        context: Context
+        context: Context,
+        groupModel: GroupModel?
     ) {
         if (message.subType == 2) {
             binding.customFileTypeText.fileTypeDisplay.setText(R.string.video_file)
@@ -38,6 +40,9 @@ class ChatListFileViewHolder(private val  binding : ItemChatFileBinding):  Recyc
         binding.otherUserName = otherUser
         binding.model = message
         binding.sendStatus = sendStatus
+        if (groupModel != null) {
+            binding.isAutoCreated = groupModel.autoCreated == 1
+        }
         if (binding.model?.from == ownUserName) {
             binding.sender = true
             binding.seenMsg =

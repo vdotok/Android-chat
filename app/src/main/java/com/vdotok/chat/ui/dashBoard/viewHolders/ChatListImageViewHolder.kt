@@ -15,17 +15,21 @@ import com.vdotok.chat.utils.ApplicationConstants
 import com.vdotok.connect.models.Message
 import com.vdotok.connect.models.ReceiptType
 import com.vdotok.connect.utils.ImageUtils.decodeBase64
+import com.vdotok.network.models.GroupModel
 import java.io.File
 
 class ChatListImageViewHolder(private val  binding : ItemChatImageBinding):  RecyclerView.ViewHolder(binding.root){
     var sendStatus = false
     val directoryName: String = "Vdotok-chat"
-    fun bind(message: Message, unreadMessage: (Message) -> Unit, ownUserName: String, otherUser: String,context: Context) {
+    fun bind(message: Message, unreadMessage: (Message) -> Unit, ownUserName: String, otherUser: String,context: Context, groupModel: GroupModel?) {
         binding.customImageTypeText.imageTypeMessage.setImageBitmap(decodeBase64(message.content))
         binding.customImageTypeText.image.setOnClickListener { onImageClick(context) }
         binding.otherUserName = otherUser
         binding.model = message
         binding.sendStatus = sendStatus
+        if (groupModel != null) {
+            binding.isAutoCreated = groupModel.autoCreated == 1
+        }
         if (binding.model?.from == ownUserName) {
             binding.sender = true
             binding.seenMsg =

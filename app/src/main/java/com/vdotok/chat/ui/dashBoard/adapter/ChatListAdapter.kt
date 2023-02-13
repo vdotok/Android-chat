@@ -4,10 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.vdotok.connect.models.Message
-import com.vdotok.connect.models.MessageType
-import com.vdotok.connect.models.ReadReceiptModel
-import com.vdotok.connect.models.ReceiptType
 import com.vdotok.chat.databinding.ItemChatFileBinding
 import com.vdotok.chat.databinding.ItemChatImageBinding
 import com.vdotok.chat.databinding.ItemChatTextBinding
@@ -15,7 +11,11 @@ import com.vdotok.chat.ui.dashBoard.ui.ChatFragment
 import com.vdotok.chat.ui.dashBoard.viewHolders.ChatListFileViewHolder
 import com.vdotok.chat.ui.dashBoard.viewHolders.ChatListImageViewHolder
 import com.vdotok.chat.ui.dashBoard.viewHolders.ChatListTextViewHolder
-import kotlin.collections.ArrayList
+import com.vdotok.connect.models.Message
+import com.vdotok.connect.models.MessageType
+import com.vdotok.connect.models.ReadReceiptModel
+import com.vdotok.connect.models.ReceiptType
+import com.vdotok.network.models.GroupModel
 
 
 class ChatListAdapter(
@@ -23,7 +23,9 @@ class ChatListAdapter(
     private val chatFragment: ChatFragment,
     private val userName: String,
     list: List<Message>,
-    private val callBack: OnMediaItemClickCallbackListner):
+    private val groupModel: GroupModel?,
+    private val callBack: OnMediaItemClickCallbackListner
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_TEXT_MESSAGE = 1
@@ -42,21 +44,44 @@ class ChatListAdapter(
                 ItemChatTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             ChatListTextViewHolder(view)
         } else if (viewType == VIEW_TYPE_IMAGE_MESSAGE) {
-            val view = ItemChatImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val view =
+                ItemChatImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             ChatListImageViewHolder(view)
         } else {
-            val view =  ItemChatFileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val view =
+                ItemChatFileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
             ChatListFileViewHolder(view)
         }
 
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (getItemViewType(position) == VIEW_TYPE_TEXT_MESSAGE ){
-            (holder as  ChatListTextViewHolder).bind({chatFragment.sendAcknowledgeMsgToGroup(items[position])},items[position],userName,chatFragment.getUserName(items[position]))
-        }else if (getItemViewType(position)== VIEW_TYPE_IMAGE_MESSAGE) {
-            (holder as ChatListImageViewHolder).bind(items[position],{chatFragment.sendAcknowledgeMsgToGroup(items[position])},userName,chatFragment.getUserName(items[position]),context)
-        } else{ (holder as ChatListFileViewHolder).bind(items[position],{chatFragment.sendAcknowledgeMsgToGroup(items[position])},userName,chatFragment.getUserName(items[position]),context)
+        if (getItemViewType(position) == VIEW_TYPE_TEXT_MESSAGE) {
+            (holder as ChatListTextViewHolder).bind(
+                { chatFragment.sendAcknowledgeMsgToGroup(items[position]) },
+                items[position],
+                userName,
+                chatFragment.getUserName(items[position]),
+                groupModel
+            )
+        } else if (getItemViewType(position) == VIEW_TYPE_IMAGE_MESSAGE) {
+            (holder as ChatListImageViewHolder).bind(
+                items[position],
+                { chatFragment.sendAcknowledgeMsgToGroup(items[position]) },
+                userName,
+                chatFragment.getUserName(items[position]),
+                context,
+                groupModel
+            )
+        } else {
+            (holder as ChatListFileViewHolder).bind(
+                items[position],
+                { chatFragment.sendAcknowledgeMsgToGroup(items[position]) },
+                userName,
+                chatFragment.getUserName(items[position]),
+                context,
+                groupModel
+            )
         }
     }
 
@@ -75,7 +100,7 @@ class ChatListAdapter(
         val item = items.firstOrNull { it.id == model.messageId }
         val position = items.indexOf(item)
 
-        if(model.receiptType == ReceiptType.SEEN.value){
+        if (model.receiptType == ReceiptType.SEEN.value) {
             item?.status = model.receiptType
             item?.readCount = item?.readCount?.plus(1) ?: 0
 
@@ -87,7 +112,6 @@ class ChatListAdapter(
         }
 
 
-
     }
 
 
@@ -95,9 +119,10 @@ class ChatListAdapter(
         return position.toLong()
 
     }
+
     override fun getItemViewType(position: Int): Int {
         var type = 0
-        val model : Message = items[position]
+        val model: Message = items[position]
         if (model.type == MessageType.text) {
             type = VIEW_TYPE_TEXT_MESSAGE
         } else if (model.type == MessageType.media) {

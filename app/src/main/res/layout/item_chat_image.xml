@@ -35,6 +35,10 @@
             name="otherUserName"
             type="String" />
 
+        <variable
+            name="isAutoCreated"
+            type="Boolean" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,7 +79,7 @@
             android:gravity="end"
             android:visibility="@{(seenMsg &amp;&amp; sender) ? View.VISIBLE : View.GONE}"
             style="@style/Theme_Text_message"
-            android:text="@{String.format(@string/read,model.readCount)}"
+            android:text="@{isAutoCreated? String.format(@string/read):String.format(@string/read_count,model.readCount)}"
             app:layout_constraintBottom_toTopOf="@id/timeStatus"
             app:layout_constraintStart_toStartOf="@+id/timeStatus"
             app:layout_constraintEnd_toEndOf="@id/timeStatus"
