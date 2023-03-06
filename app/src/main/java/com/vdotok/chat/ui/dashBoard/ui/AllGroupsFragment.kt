@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.Navigation
-import com.vdotok.connect.models.*
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.LayoutFragmentInboxBinding
 import com.vdotok.chat.dialogs.UpdateGroupNameDialog
@@ -29,13 +28,12 @@ import com.vdotok.chat.utils.ApplicationConstants.LOGIN_INFO
 import com.vdotok.chat.utils.performSingleClick
 import com.vdotok.chat.utils.showDeleteGroupAlert
 import com.vdotok.connect.manager.ChatManager
+import com.vdotok.connect.models.*
 import com.vdotok.network.models.AllGroupsResponse
 import com.vdotok.network.models.DeleteGroupModel
 import com.vdotok.network.models.GroupModel
-import com.vdotok.network.network.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.vdotok.network.network.NetworkConnectivity
+import com.vdotok.network.network.Result
 
 
 /**
@@ -84,12 +82,12 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
             binding.customToolbar.title.text = info.fullName
         }
 
-        messageUpdateLiveData.observe(this.viewLifecycleOwner, { message ->
+        messageUpdateLiveData.observe(this.viewLifecycleOwner) { message ->
 
             adapter.notifyDataSetChanged()
 
             sendAcknowledgeMsgToGroup(message)
-        })
+        }
 
         binding.tvUsername.text = prefs.loginInfo?.fullName
         binding.isSocketConnected = (activity as DashboardActivity).isSocketConnected

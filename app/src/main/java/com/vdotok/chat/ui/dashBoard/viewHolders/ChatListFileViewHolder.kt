@@ -5,14 +5,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
-import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.ItemChatFileBinding
-import com.vdotok.chat.databinding.ItemChatTextBinding
 import com.vdotok.connect.models.Message
 import com.vdotok.connect.models.ReceiptType
-import com.vdotok.connect.utils.ImageUtils
 import com.vdotok.network.models.GroupModel
 import java.io.File
 

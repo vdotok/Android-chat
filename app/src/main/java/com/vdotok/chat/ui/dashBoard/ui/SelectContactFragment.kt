@@ -19,7 +19,8 @@ import com.vdotok.chat.ui.dashBoard.adapter.OnChatItemClickCallbackListner
 import com.vdotok.chat.ui.dashBoard.adapter.SelectUserContactAdapter
 import com.vdotok.chat.ui.dashBoard.viewmodel.AllUserListFragmentViewModel
 import com.vdotok.network.models.*
-import com.vdotok.network.network.*
+import com.vdotok.network.network.NetworkConnectivity
+import com.vdotok.network.network.Result
 
 class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
 

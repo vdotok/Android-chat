@@ -39,18 +39,22 @@ class ChatListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == VIEW_TYPE_TEXT_MESSAGE) {
-            val view =
-                ItemChatTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            ChatListTextViewHolder(view)
-        } else if (viewType == VIEW_TYPE_IMAGE_MESSAGE) {
-            val view =
-                ItemChatImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            ChatListImageViewHolder(view)
-        } else {
-            val view =
-                ItemChatFileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            ChatListFileViewHolder(view)
+        return when (viewType) {
+            VIEW_TYPE_TEXT_MESSAGE -> {
+                val view =
+                    ItemChatTextBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ChatListTextViewHolder(view)
+            }
+            VIEW_TYPE_IMAGE_MESSAGE -> {
+                val view =
+                    ItemChatImageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ChatListImageViewHolder(view)
+            }
+            else -> {
+                val view =
+                    ItemChatFileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ChatListFileViewHolder(view)
+            }
         }
 
     }

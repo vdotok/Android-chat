@@ -67,7 +67,7 @@ class UpdateGroupNameDialog(private val groupModel: GroupModel, private val upda
                     dismiss()
                     updateGroup.invoke()
                 } else {
-                    binding.root.showSnackBar(R.string.group_name_empty)
+                    binding.root.showSnackBar(activity?.applicationContext?.getString(R.string.group_name_empty))
                 }
             }
         }
@@ -84,12 +84,12 @@ class UpdateGroupNameDialog(private val groupModel: GroupModel, private val upda
                         binding.progressBar.toggleVisibility()
                     }
                     is Result.Success ->  {
-                        binding.root.showSnackBar(getString(R.string.group_deleted))
+                        binding.root.showSnackBar(activity.applicationContext.getString(R.string.group_deleted))
                     }
                     is Result.Failure -> {
                         binding.progressBar.toggleVisibility()
                         if(NetworkConnectivity.isNetworkAvailable(activity).not())
-                            binding.root.showSnackBar(getString(R.string.no_internet))
+                            binding.root.showSnackBar(activity.applicationContext.getString(R.string.no_internet))
                     }
                 }
             }

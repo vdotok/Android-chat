@@ -1,23 +1,23 @@
 package com.vdotok.chat.ui.dashBoard.ui
 
 import android.Manifest
-import android.content.ContentValues
-import android.content.Context
-import android.content.Intent
+import android.app.DownloadManager
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ObservableBoolean
-import com.vdotok.connect.models.*
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.ActivityDashboardBinding
+import com.vdotok.chat.extensions.showSnackBar
 import com.vdotok.chat.interfaces.FragmentRefreshListener
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.utils.ImageUtils
@@ -26,14 +26,12 @@ import com.vdotok.chat.utils.createAppDirectory
 import com.vdotok.chat.utils.saveFileDataOnExternalData
 import com.vdotok.connect.manager.ChatManager
 import com.vdotok.connect.manager.ChatManagerCallback
+import com.vdotok.connect.models.*
 import com.vdotok.connect.models.Message
-import com.vdotok.connect.models.Presence
 import com.vdotok.network.models.GroupModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+
 
 class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
@@ -51,6 +49,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     private lateinit var myLiveData: NetworkStatusLiveData
     private var internetConnectionRestored = false
     var file: File? = null
+    val downloadedFilesId: ArrayList<Long> = ArrayList()
 
 
     var isSocketConnected: ObservableBoolean = ObservableBoolean(false)
@@ -63,12 +62,26 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
     var lastMessageGroupKey = ""
 
+    private val onDownloadComplete: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            //Fetching the download id received with the broadcast
+            val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            //Checking if the received broadcast is for our enqueued download by matching download id
+            if (downloadedFilesId.contains(id)) {
+                mListener?.downloadFileComplete()
+                Log.e("onDownloadComplete", "onReceive: Download Complete!")
+                binding.root.showSnackBar("File Download Complete!")
+                downloadedFilesId.remove(id)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         askForPermissions()
         init()
 //        addInternetConnectionObserver()
-
+        registerReceiver(onDownloadComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
     }
 
@@ -125,6 +138,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     override fun onDestroy() {
         super.onDestroy()
         chatManger?.disconnect()
+        unregisterReceiver(onDownloadComplete)
     }
 
     companion object {

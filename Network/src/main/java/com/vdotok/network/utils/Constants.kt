@@ -1,5 +1,6 @@
 package com.vdotok.network.utils
 
 object Constants {
-    const val BASE_URL = "Please Enter API Service URL"
+    const val BASE_URL = "https://q-tenant.vdotok.dev/"
+    const val API_KEY = "d2f62c5747874d69a98100541210610"
 }

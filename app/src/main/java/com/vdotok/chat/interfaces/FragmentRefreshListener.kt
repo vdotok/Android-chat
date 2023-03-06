@@ -24,4 +24,5 @@ interface FragmentRefreshListener {
     fun onConnectionLost()
     fun onFileSendingComplete()
     fun attachmentSendingFailed(headerId:String){}
+    fun downloadFileComplete(){}
 }

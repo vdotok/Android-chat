@@ -20,7 +20,8 @@ import com.vdotok.chat.ui.dashBoard.adapter.AllUserListAdapter
 import com.vdotok.chat.ui.dashBoard.adapter.OnInboxItemClickCallbackListner
 import com.vdotok.chat.ui.dashBoard.viewmodel.AllUserListFragmentViewModel
 import com.vdotok.network.models.*
-import com.vdotok.network.network.*
+import com.vdotok.network.network.NetworkConnectivity
+import com.vdotok.network.network.Result
 
 class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
 

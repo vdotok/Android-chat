@@ -3,15 +3,13 @@ package com.vdotok.chat.ui.dashBoard.viewHolders
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
-import android.provider.MediaStore
-import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.vdotok.chat.databinding.ItemChatImageBinding
-import com.vdotok.chat.databinding.ItemChatTextBinding
-import com.vdotok.chat.utils.ApplicationConstants
+import com.vdotok.chat.glide.GlideApp
 import com.vdotok.connect.models.Message
 import com.vdotok.connect.models.ReceiptType
 import com.vdotok.connect.utils.ImageUtils.decodeBase64
@@ -22,7 +20,10 @@ class ChatListImageViewHolder(private val  binding : ItemChatImageBinding):  Rec
     var sendStatus = false
     val directoryName: String = "Vdotok-chat"
     fun bind(message: Message, unreadMessage: (Message) -> Unit, ownUserName: String, otherUser: String,context: Context, groupModel: GroupModel?) {
-        binding.customImageTypeText.imageTypeMessage.setImageBitmap(decodeBase64(message.content))
+//        binding.customImageTypeText.imageTypeMessage.setImageBitmap(decodeBase64(message.content))
+        GlideApp.with(context).load(message.content)
+            .diskCacheStrategy(DiskCacheStrategy.DATA)
+            .into(binding.customImageTypeText.imageTypeMessage)
         binding.customImageTypeText.image.setOnClickListener { onImageClick(context) }
         binding.otherUserName = otherUser
         binding.model = message

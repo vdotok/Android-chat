@@ -8,7 +8,7 @@ import com.vdotok.network.di.module.RetrofitModule
 import com.vdotok.network.models.CheckUserModel
 import com.vdotok.network.models.LoginUserModel
 import com.vdotok.network.models.SignUpModel
-import com.vdotok.network.network.*
+import com.vdotok.network.network.Result
 import com.vdotok.network.repository.AccountRepository
 
 class AccountViewModel: ViewModel() {

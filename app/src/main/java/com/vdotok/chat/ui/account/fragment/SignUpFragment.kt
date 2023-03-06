@@ -14,8 +14,10 @@ import com.vdotok.chat.extensions.*
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.account.viewmodel.AccountViewModel
 import com.vdotok.chat.ui.dashBoard.ui.DashboardActivity
-import com.vdotok.chat.utils.*
 import com.vdotok.chat.utils.ApplicationConstants.PROJECT_ID
+import com.vdotok.chat.utils.disable
+import com.vdotok.chat.utils.enable
+import com.vdotok.chat.utils.saveResponseToPrefs
 import com.vdotok.network.models.LoginResponse
 import com.vdotok.network.models.SignUpModel
 import com.vdotok.network.network.HttpResponseCodes
