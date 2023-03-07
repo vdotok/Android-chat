@@ -7,23 +7,11 @@ package com.vdotok.chat.utils
  */
 object ApplicationConstants {
 
-    const val API_BASE_URL: String = "https://stenant.vdotok.dev/"
-    const val SDK_AUTH_BASE_URL: String = "https://vtkapi.vdotok.com/"
-
     //    SDK AUTH PARAMS
     const val SDK_API_KEY: String = "3d9686b635b15b5bc2d19800407609fa"
-    const val PROJECT_ID: String = "115G1WZI"
-//    const val PROJECT_ID: String = "3NZ2IZ"
+    const val PROJECT_ID: String = "Enter your Project Id here"
 
-//    /*********************** DEV URLs *************************/
-//    const val API_BASE_URL: String = "https://tenant-api.vdotok.dev/"
-//    const val SDK_AUTH_BASE_URL: String = "https://vtkapi.vdotok.com/"
-//
-////    SDK AUTH PARAMS
-//    const val SDK_API_KEY: String = "3d9686b635b15b5bc2d19800407609fa"
-//    const val PROJECT_ID: String = "125YLEY1"
-
-//    Prefs constants
+    //    Prefs constants
     const val SOCKET_CONNECTION = "SOCKET_CONNECTION"
     const val LOGIN_INFO = "LOGIN_INFO"
     const val GROUP_MODEL_KEY = "GROUP_MODEL_KEY"
@@ -46,7 +34,7 @@ object ApplicationConstants {
     const val AUDIO_DIRECTORY = "/Vdotok-chat/audios"
     const val DOCS_DIRECTORY = "/Vdotok-chat/docs"
 
-//    API ERROR LOG TAGS
+    //    API ERROR LOG TAGS
     const val API_ERROR = "API_ERROR"
     const val HTTP_CODE_NO_NETWORK = 600
     const val SUCCESS_CODE = 200
