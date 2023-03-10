@@ -129,7 +129,7 @@ class ChatListAdapter(
         val model: Message = items[position]
         if (model.type == MessageType.text) {
             type = VIEW_TYPE_TEXT_MESSAGE
-        } else if (model.type == MessageType.media) {
+        } else if (model.type == MessageType.ftp) {
             type = if (model.subType == 0) {
                 VIEW_TYPE_IMAGE_MESSAGE
             } else {

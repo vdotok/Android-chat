@@ -296,7 +296,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
                     it.channelName,
                     it.channelKey,
                     loginUserRefId,
-                    MessageType.media,
+                    MessageType.ftp,
                     url,
                     0f,
                     getIsGroupMessage(),
@@ -850,7 +850,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
             if (message.key == groupModel?.channelKey) {
                 (activity as DashboardActivity).mapUnreadCount.clear()
                 usersList.clear()
-                if ((message.type == MessageType.media) && (message.from != loginUserRefId))
+                if ((message.type == MessageType.ftp) && (message.from != loginUserRefId))
                     downloadFileToStorage(message)
                 adapter.addItem(message)
                 binding.progressBar.hide()
