@@ -921,7 +921,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
 
     }
 
-    override fun recieveAttachment(msgId: String) {
+    override fun receiveAttachment(msgId: String) {
 
     }
 
@@ -1020,6 +1020,10 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
         activity?.runOnUiThread {
             deleteTempFile()
         }
+    }
+
+    override fun onNotification(notification: String) {
+//        TODO("Not yet implemented")
     }
 
     companion object {

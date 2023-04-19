@@ -11,16 +11,21 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.LayoutSelectContactBinding
 import com.vdotok.chat.extensions.*
+import com.vdotok.chat.models.Data
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.dashBoard.adapter.OnChatItemClickCallbackListner
 import com.vdotok.chat.ui.dashBoard.adapter.SelectUserContactAdapter
 import com.vdotok.chat.ui.dashBoard.viewmodel.AllUserListFragmentViewModel
+import com.vdotok.connect.manager.ChatManager
+import com.vdotok.connect.models.NotificationEvent
 import com.vdotok.network.models.*
 import com.vdotok.network.network.NetworkConnectivity
 import com.vdotok.network.network.Result
+import org.json.JSONArray
 
 class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
 
@@ -28,6 +33,7 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
     private lateinit var binding: LayoutSelectContactBinding
     private lateinit var prefs: Prefs
     var title : String? = null
+    private lateinit var cManger: ChatManager
 
     private val viewModel : AllUserListFragmentViewModel by viewModels()
 
@@ -51,7 +57,9 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
 
     private fun init() {
         initUserListAdapter()
-
+        activity?.let {
+            cManger = ChatManager.getInstance(it)
+        }
         binding.search = edtSearch
 
        binding.customToolbar.title.text = getString(R.string.new_chat)
@@ -165,8 +173,22 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
 
     private fun handleCreateGroupSuccess(response: CreateGroupResponse) {
         activity?.hideKeyboard()
-        response.groupModel?.let {
-            (activity as DashboardActivity).subscribe(it)
+        response.groupModel?.let { model ->
+            val dataModel = Data(
+                action = NotificationEvent.NEW.value,
+                groupModel = model
+            )
+            val toList: JSONArray = JSONArray().apply {
+                model.participants.forEach {
+                    it.refID?.let { it1 -> this.put(it1) }
+                }
+            }
+            cManger.publishNotification(
+                from = prefs.loginInfo?.refId.toString(),
+                to = toList,
+                data = Gson().toJson(dataModel)
+            )
+            (activity as DashboardActivity).subscribe(model)
         }
         openChatFragment(response.groupModel)
     }

@@ -1,5 +1,6 @@
 package com.vdotok.chat.ui.dashBoard.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -7,9 +8,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.Navigation
+import com.google.gson.Gson
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.LayoutFragmentInboxBinding
 import com.vdotok.chat.dialogs.UpdateGroupNameDialog
@@ -17,6 +20,8 @@ import com.vdotok.chat.extensions.hide
 import com.vdotok.chat.extensions.show
 import com.vdotok.chat.extensions.showSnackBar
 import com.vdotok.chat.extensions.toggleVisibility
+import com.vdotok.chat.models.Data
+import com.vdotok.chat.models.NotificationData
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.account.ui.AccountActivity.Companion.createAccountsActivity
 import com.vdotok.chat.ui.dashBoard.adapter.AllGroupsListAdapter
@@ -34,6 +39,7 @@ import com.vdotok.network.models.DeleteGroupModel
 import com.vdotok.network.models.GroupModel
 import com.vdotok.network.network.NetworkConnectivity
 import com.vdotok.network.network.Result
+import org.json.JSONArray
 
 
 /**
@@ -145,7 +151,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
-    private fun deleteGroup(model: DeleteGroupModel) {
+    private fun deleteGroup(model: DeleteGroupModel, groupModel: GroupModel) {
         binding.progressBar.toggleVisibility()
 
         activity?.let { activity ->
@@ -157,7 +163,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
                     }
                     is Result.Success ->  {
                         if (it.data.status == ApplicationConstants.SUCCESS_CODE) {
-                            getAllGroups()
+                            handleGroupDelete(groupModel)
                             binding.root.showSnackBar(getString(R.string.group_deleted))
                         } else {
                             binding.root.showSnackBar(it.data.message)
@@ -173,6 +179,21 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateGroupData()
+    }
+
+    private fun updateGroupData() {
+        val groupData = (activity as DashboardActivity).groupListData
+        adapter.updateData(groupData)
+        if ((activity as DashboardActivity).groupListData.isEmpty()) {
+            binding.groupChatListing.show()
+        } else {
+            binding.groupChatListing.hide()
+        }
+    }
+
     private fun addPullToRefresh() {
         binding.swipeRefreshLay.isEnabled = true
         binding.swipeRefreshLay.setOnRefreshListener {
@@ -182,15 +203,37 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
+    private fun handleGroupDelete(groupModel: GroupModel) {
+        (activity as DashboardActivity).groupListData.remove(groupModel)
+        updateGroupData()
+        groupModel.let { model ->
+            val dataModel = Data(
+                action = NotificationEvent.DELETE.value,
+                groupModel = model
+            )
+            val toList: JSONArray = JSONArray().apply {
+                model.participants.forEach {
+                    it.refID?.let { it1 -> this.put(it1) }
+                }
+            }
+            cManger.publishNotification(
+                from = prefs.loginInfo?.refId.toString(),
+                to = toList,
+                data = Gson().toJson(dataModel)
+            )
+        }
+    }
+
     private fun handleGroupSuccess(response: AllGroupsResponse) {
         if (response.groups?.isEmpty() == true) {
             binding.groupChatListing.show()
             binding.rcvUserList.hide()
+            (activity as DashboardActivity).groupListData = ArrayList()
         } else {
 
+            (activity as DashboardActivity).groupListData = response.groups as ArrayList<GroupModel>
             dataSet.clear()
             response.groups?.let { dataSet.addAll(it) }
-
             addLastMessageGroupToTop()
 
             binding.groupChatListing.hide()
@@ -347,7 +390,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     override fun sendAttachment(msgId: String, fileType: Int) {
     }
 
-    override fun recieveAttachment(msgId: String) {
+    override fun receiveAttachment(msgId: String) {
 
     }
 
@@ -405,7 +448,41 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         showDeleteGroupAlert(this.activity) { _, _ ->
             val model = DeleteGroupModel()
             model.groupId = groupId
-            deleteGroup(model)
+            val deletedModel = dataSet.find { groupModel -> groupModel.id == groupId }
+            deletedModel?.let { deleteGroup(model, it) }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun onNotification(notification: String) {
+        activity?.runOnUiThread {
+
+            val dataModel = Gson().fromJson(notification, NotificationData::class.java)
+            val data: ArrayList<GroupModel> = (activity as DashboardActivity).groupListData
+            val groupData = dataModel.data.groupModel
+
+            when(dataModel.data.action) {
+                NotificationEvent.NEW.value -> {
+                    binding.groupChatListing.hide()
+                    if (!data.contains(groupData)){
+                        data.add(groupData)
+                        adapter.updateData(data)
+                        setGroupMapData((activity as DashboardActivity).groupListData)
+                        dataSet.add(groupData)
+                        doSubscribe()
+                    }
+                }
+                NotificationEvent.MODIFY.value -> {
+                    data[data.indexOfFirst { groupModel -> groupModel.id == groupData.id }] = groupData
+                    (activity as DashboardActivity).groupListData = data
+                    adapter.updateData(data)
+                }
+                NotificationEvent.DELETE.value -> {
+                    (activity as DashboardActivity).groupListData.removeIf { groupModel -> groupModel.id == groupData.id}
+                    updateGroupData()
+                }
+                else -> {}
+            }
         }
     }
 

@@ -8,7 +8,6 @@ import android.net.Uri
 import android.os.*
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -50,6 +49,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     private var internetConnectionRestored = false
     var file: File? = null
     val downloadedFilesId: ArrayList<Long> = ArrayList()
+    var groupListData = ArrayList<GroupModel>()
 
 
     var isSocketConnected: ObservableBoolean = ObservableBoolean(false)
@@ -119,6 +119,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     private fun connect() {
         prefs.mConnection?.let {
 //            it.host = "ssl://".plus(it.host)
+//            it.host = "wss://q-messaging1.vdotok.dev"
             it.interval = 5
             chatManger?.connect(it)
         }
@@ -316,6 +317,10 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
        }
     }
 
+    override fun onNotificationReceived(notification: String) {
+        mListener?.onNotification(notification)
+    }
+
     override fun onFileReceivingFailed() {
         mListener?.attachmentReceivedFailed()
     }
@@ -325,7 +330,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
     }
 
     override fun onFileReceivingStarted(fileHeaderId: String) {
-        mListener?.recieveAttachment(fileHeaderId)
+        mListener?.receiveAttachment(fileHeaderId)
     }
 
     override fun onFileSendingComplete(fileHeaderId: String, fileType: Int) {
