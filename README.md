@@ -24,7 +24,7 @@ IDE Installation & Build Guide
 Bravo! You’ve successfully configured the project in Android Studio.
 
 <b>Download Connect Lib:</b>
-* Open following link to get the latest aar: https://sdk.vdotok.com/Android-SDKs/connect.aar 
+* Use the following link to get the latest aar: https://sdk.vdotok.com/Android-SDKs/connect.aar 
 
 <b>Configure Lib:</b>
 * In <b> Android Studio File Explorer</b>, select <b>Project</b>
@@ -37,8 +37,8 @@ Bravo! You’ve successfully configured the project in Android Studio.
 
 <b>Project Signup:</b>
 * Register your account on [VdoTok](https://www.vdotok.com/) to get the <b>Project ID</b> and <b>API Service URL</b>
-* From file explorer, double-click on <b>vdotok-chat -> app -> src -> main -> java -> com -> vdotok -> chat -> utils -> ApplicationConstants</b> replace <b>SDK_PROJECT_ID</b> with your own <b>Project Id</b>
-* From file explorer, double-click on <b>vdotok-chat -> Network -> src -> main -> java -> com ->vdotok -> network -> utils -> Constants</b> replace <b>BASE_URL</b> with your own <b>API Service URL</b>
+* From file explorer, double-click on <b>vdotok-chat -> app -> src -> main -> java -> com -> vdotok -> chat -> utils -> ApplicationConstants</b>, and replace <b>SDK_PROJECT_ID</b> with your own <b>Project Id</b>
+* From file explorer, double-click on <b>vdotok-chat -> Network -> src -> main -> java -> com ->vdotok -> network -> utils -> Constants</b>, and replace <b>BASE_URL</b> with your own <b>API Service URL</b>
 
 <b>Device Setting:</b>
 * To connect a device, enable <b>“developer mode”</b> and <b>“USB debugging”</b> by following the device-specific steps provided [here.](https://developer.android.com/studio/debug/dev-options)
