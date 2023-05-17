@@ -19,9 +19,9 @@ import com.vdotok.chat.dialogs.viewmodel.UpdateGroupNameDialogViewModel
 import com.vdotok.chat.extensions.showSnackBar
 import com.vdotok.chat.extensions.toggleVisibility
 import com.vdotok.chat.models.Data
+import com.vdotok.chat.models.NotificationEvent
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.connect.manager.ChatManager
-import com.vdotok.connect.models.NotificationEvent
 import com.vdotok.network.models.GroupModel
 import com.vdotok.network.models.UpdateGroupNameModel
 import com.vdotok.network.network.NetworkConnectivity

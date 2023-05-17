@@ -16,12 +16,12 @@ import com.vdotok.chat.R
 import com.vdotok.chat.databinding.LayoutSelectContactBinding
 import com.vdotok.chat.extensions.*
 import com.vdotok.chat.models.Data
+import com.vdotok.chat.models.NotificationEvent
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.dashBoard.adapter.OnChatItemClickCallbackListner
 import com.vdotok.chat.ui.dashBoard.adapter.SelectUserContactAdapter
 import com.vdotok.chat.ui.dashBoard.viewmodel.AllUserListFragmentViewModel
 import com.vdotok.connect.manager.ChatManager
-import com.vdotok.connect.models.NotificationEvent
 import com.vdotok.network.models.*
 import com.vdotok.network.network.NetworkConnectivity
 import com.vdotok.network.network.Result

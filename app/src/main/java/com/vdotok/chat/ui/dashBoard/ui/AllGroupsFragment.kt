@@ -22,6 +22,7 @@ import com.vdotok.chat.extensions.showSnackBar
 import com.vdotok.chat.extensions.toggleVisibility
 import com.vdotok.chat.models.Data
 import com.vdotok.chat.models.NotificationData
+import com.vdotok.chat.models.NotificationEvent
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.account.ui.AccountActivity.Companion.createAccountsActivity
 import com.vdotok.chat.ui.dashBoard.adapter.AllGroupsListAdapter

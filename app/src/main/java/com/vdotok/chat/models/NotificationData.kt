@@ -1,6 +1,5 @@
 package com.vdotok.chat.models
 
-import com.vdotok.connect.models.NotificationEvent
 import com.vdotok.network.models.GroupModel
 
 data class NotificationData(

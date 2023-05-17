@@ -17,12 +17,12 @@ import com.vdotok.chat.databinding.LayoutAllUserListBinding
 import com.vdotok.chat.dialogs.CreateGroupDialog
 import com.vdotok.chat.extensions.*
 import com.vdotok.chat.models.Data
+import com.vdotok.chat.models.NotificationEvent
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.dashBoard.adapter.AllUserListAdapter
 import com.vdotok.chat.ui.dashBoard.adapter.OnInboxItemClickCallbackListner
 import com.vdotok.chat.ui.dashBoard.viewmodel.AllUserListFragmentViewModel
 import com.vdotok.connect.manager.ChatManager
-import com.vdotok.connect.models.NotificationEvent
 import com.vdotok.network.models.*
 import com.vdotok.network.network.NetworkConnectivity
 import com.vdotok.network.network.Result
