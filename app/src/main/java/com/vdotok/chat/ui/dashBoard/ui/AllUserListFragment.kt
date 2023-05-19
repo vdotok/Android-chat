@@ -158,13 +158,13 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
 
     private fun handleCreateGroupSuccess(response: CreateGroupResponse) {
         activity?.hideKeyboard()
-        response.groupModel?.let { model ->
+        response.let { model ->
             val dataModel = Data(
                 action = NotificationEvent.NEW.value,
                 groupModel = model
             )
             val toList: JSONArray = JSONArray().apply {
-                model.participants.forEach {
+                model.groupModel.participants.forEach {
                     it.refID?.let { it1 -> this.put(it1) }
                 }
             }
@@ -173,7 +173,7 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
                 to = toList,
                 data = Gson().toJson(dataModel)
             )
-            (activity as DashboardActivity).subscribe(model)
+            (activity as DashboardActivity).subscribe(model.groupModel)
         }
 
     }
@@ -215,22 +215,22 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
     }
 
     private fun textListenerForSearch() {
-            binding.searchEditText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
+        binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
 
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
-                override fun afterTextChanged(s: Editable) {
-                   adapter.filter?.filter(s)
-                }
-            })
-        }
+            override fun afterTextChanged(s: Editable) {
+                adapter.filter?.filter(s)
+            }
+        })
+    }
 
     private fun openChatFragment(groupModel: GroupModel?) {
         val bundle = Bundle()

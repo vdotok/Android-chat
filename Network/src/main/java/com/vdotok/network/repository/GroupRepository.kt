@@ -18,7 +18,7 @@ class GroupRepository  @Inject constructor(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    suspend fun updateGroupName(token: String, model: UpdateGroupNameModel): Result<UpdateGroupNameResponseModel> {
+    suspend fun updateGroupName(token: String, model: UpdateGroupNameModel): Result<CreateGroupResponse> {
         return safeApiCall(dispatcher) {
             apiService.updateGroupName(token, model)
         }
@@ -36,7 +36,7 @@ class GroupRepository  @Inject constructor(
         }
     }
 
-    suspend fun deleteGroup(token: String, model: DeleteGroupModel): Result<DeleteGroupResponseModel> {
+    suspend fun deleteGroup(token: String, model: DeleteGroupModel): Result<CreateGroupResponse> {
         return safeApiCall(dispatcher) {
             apiService.deleteGroup(token, model)
         }

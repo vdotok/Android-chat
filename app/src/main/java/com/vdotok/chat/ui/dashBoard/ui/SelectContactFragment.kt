@@ -62,14 +62,14 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
         }
         binding.search = edtSearch
 
-       binding.customToolbar.title.text = getString(R.string.new_chat)
-       binding.customToolbar.createGroupBtn.hide()
+        binding.customToolbar.title.text = getString(R.string.new_chat)
+        binding.customToolbar.createGroupBtn.hide()
 
-       binding.tvGroupChat.setOnClickListener {
-           activity?.hideKeyboard()
-           openAllUserListFragment()
-           edtSearch.set("")
-       }
+        binding.tvGroupChat.setOnClickListener {
+            activity?.hideKeyboard()
+            openAllUserListFragment()
+            edtSearch.set("")
+        }
 
         binding.customToolbar.imgBack.setOnClickListener {
             activity?.hideKeyboard()
@@ -173,13 +173,13 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
 
     private fun handleCreateGroupSuccess(response: CreateGroupResponse) {
         activity?.hideKeyboard()
-        response.groupModel?.let { model ->
+        response.let { model ->
             val dataModel = Data(
                 action = NotificationEvent.NEW.value,
                 groupModel = model
             )
             val toList: JSONArray = JSONArray().apply {
-                model.participants.forEach {
+                model.groupModel.participants.forEach {
                     it.refID?.let { it1 -> this.put(it1) }
                 }
             }
@@ -188,7 +188,7 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
                 to = toList,
                 data = Gson().toJson(dataModel)
             )
-            (activity as DashboardActivity).subscribe(model)
+            (activity as DashboardActivity).subscribe(model.groupModel)
         }
         openChatFragment(response.groupModel)
     }

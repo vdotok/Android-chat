@@ -27,10 +27,10 @@ interface ApiService {
     suspend fun getAllGroups(@Header("Authorization") auth_token: String): AllGroupsResponse
 
     @POST("API/v0/DeleteGroup")
-    suspend fun deleteGroup(@Header("Authorization") auth_token: String, @Body model: DeleteGroupModel): DeleteGroupResponseModel
+    suspend fun deleteGroup(@Header("Authorization") auth_token: String, @Body model: DeleteGroupModel): CreateGroupResponse
 
     @POST("API/v0/RenameGroup")
-    suspend fun updateGroupName(@Header("Authorization") auth_token: String, @Body model: UpdateGroupNameModel): UpdateGroupNameResponseModel
+    suspend fun updateGroupName(@Header("Authorization") auth_token: String, @Body model: UpdateGroupNameModel): CreateGroupResponse
 
     @POST("API/v0/CreateGroup")
     suspend fun createGroup(@Header("Authorization") auth_token: String, @Body model: CreateGroupModel): CreateGroupResponse

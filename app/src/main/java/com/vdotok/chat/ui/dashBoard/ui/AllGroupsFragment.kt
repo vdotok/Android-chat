@@ -36,6 +36,7 @@ import com.vdotok.chat.utils.showDeleteGroupAlert
 import com.vdotok.connect.manager.ChatManager
 import com.vdotok.connect.models.*
 import com.vdotok.network.models.AllGroupsResponse
+import com.vdotok.network.models.CreateGroupResponse
 import com.vdotok.network.models.DeleteGroupModel
 import com.vdotok.network.models.GroupModel
 import com.vdotok.network.network.NetworkConnectivity
@@ -164,7 +165,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
                     }
                     is Result.Success ->  {
                         if (it.data.status == ApplicationConstants.SUCCESS_CODE) {
-                            handleGroupDelete(groupModel)
+                            handleGroupDelete(it.data)
                             binding.root.showSnackBar(getString(R.string.group_deleted))
                         } else {
                             binding.root.showSnackBar(it.data.message)
@@ -204,16 +205,16 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
-    private fun handleGroupDelete(groupModel: GroupModel) {
-        (activity as DashboardActivity).groupListData.remove(groupModel)
+    private fun handleGroupDelete(createGroupResponse: CreateGroupResponse) {
+        (activity as DashboardActivity).groupListData.remove(createGroupResponse.groupModel)
         updateGroupData()
-        groupModel.let { model ->
+        createGroupResponse.let { model ->
             val dataModel = Data(
                 action = NotificationEvent.DELETE.value,
-                groupModel = model
+                groupModel = createGroupResponse
             )
             val toList: JSONArray = JSONArray().apply {
-                model.participants.forEach {
+                createGroupResponse.groupModel.participants.forEach {
                     it.refID?.let { it1 -> this.put(it1) }
                 }
             }
@@ -466,20 +467,20 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
                 NotificationEvent.NEW.value -> {
                     binding.groupChatListing.hide()
                     if (!data.contains(groupData)){
-                        data.add(groupData)
+                        data.add(groupData.groupModel)
                         adapter.updateData(data)
                         setGroupMapData((activity as DashboardActivity).groupListData)
-                        dataSet.add(groupData)
+                        dataSet.add(groupData.groupModel)
                         doSubscribe()
                     }
                 }
                 NotificationEvent.MODIFY.value -> {
-                    data[data.indexOfFirst { groupModel -> groupModel.id == groupData.id }] = groupData
+                    data[data.indexOfFirst { groupModel -> groupModel.id == groupData.groupModel.id }] = groupData.groupModel
                     (activity as DashboardActivity).groupListData = data
                     adapter.updateData(data)
                 }
                 NotificationEvent.DELETE.value -> {
-                    (activity as DashboardActivity).groupListData.removeIf { groupModel -> groupModel.id == groupData.id}
+                    (activity as DashboardActivity).groupListData.removeIf { groupModel -> groupModel.id == groupData.groupModel.id}
                     updateGroupData()
                 }
                 else -> {}

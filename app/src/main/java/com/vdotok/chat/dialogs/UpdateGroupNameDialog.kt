@@ -22,6 +22,7 @@ import com.vdotok.chat.models.Data
 import com.vdotok.chat.models.NotificationEvent
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.connect.manager.ChatManager
+import com.vdotok.network.models.CreateGroupResponse
 import com.vdotok.network.models.GroupModel
 import com.vdotok.network.models.UpdateGroupNameModel
 import com.vdotok.network.network.NetworkConnectivity
@@ -96,7 +97,7 @@ class UpdateGroupNameDialog(private val groupModel: GroupModel, private val upda
                         binding.progressBar.toggleVisibility()
                     }
                     is Result.Success ->  {
-                        handleGroupRename(it.data.groupModel)
+                        handleGroupRename(it.data)
                         binding.root.showSnackBar(activity.applicationContext.getString(R.string.group_deleted))
                     }
                     is Result.Failure -> {
@@ -109,11 +110,11 @@ class UpdateGroupNameDialog(private val groupModel: GroupModel, private val upda
         }
     }
 
-    private fun handleGroupRename(groupModel: GroupModel) {
+    private fun handleGroupRename(createGroupResponse: CreateGroupResponse) {
         groupModel.let { model ->
             val dataModel = Data(
                 action = NotificationEvent.MODIFY.value,
-                groupModel = model
+                groupModel = createGroupResponse
             )
             val toList: JSONArray = JSONArray().apply {
                 model.participants.forEach {
