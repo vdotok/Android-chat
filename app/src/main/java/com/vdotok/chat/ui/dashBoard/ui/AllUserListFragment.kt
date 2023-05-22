@@ -175,7 +175,7 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
             )
             (activity as DashboardActivity).subscribe(model.groupModel)
         }
-
+        openChatFragment(response.groupModel)
     }
 
     /**
