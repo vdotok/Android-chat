@@ -153,6 +153,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun deleteGroup(model: DeleteGroupModel, groupModel: GroupModel) {
         binding.progressBar.toggleVisibility()
 
@@ -188,12 +189,14 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
 
     private fun updateGroupData() {
         val groupData = (activity as DashboardActivity).groupListData
-        adapter.updateData(groupData)
         if ((activity as DashboardActivity).groupListData.isEmpty()) {
             binding.groupChatListing.show()
+            binding.rcvUserList.hide()
         } else {
             binding.groupChatListing.hide()
+            binding.rcvUserList.show()
         }
+        adapter.updateData(groupData)
     }
 
     private fun addPullToRefresh() {
@@ -205,8 +208,12 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun handleGroupDelete(createGroupResponse: CreateGroupResponse) {
-        (activity as DashboardActivity).groupListData.remove(createGroupResponse.groupModel)
+
+        val dataList = (activity as DashboardActivity).groupListData
+        dataList.removeIf { it.id == createGroupResponse.groupModel.id }
+
         updateGroupData()
         createGroupResponse.let { model ->
             val dataModel = Data(
@@ -446,6 +453,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }, 2000)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun showDeleteGroupDialog(groupId: Int) {
         showDeleteGroupAlert(this.activity) { _, _ ->
             val model = DeleteGroupModel()
@@ -465,11 +473,10 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
 
             when(dataModel.data.action) {
                 NotificationEvent.NEW.value -> {
-                    binding.groupChatListing.hide()
-                    if (!data.contains(groupData)){
+                    if (data.find { it.id == groupData.groupModel.id} == null) {
                         data.add(groupData.groupModel)
-                        adapter.updateData(data)
-                        setGroupMapData((activity as DashboardActivity).groupListData)
+                        updateGroupData()
+                        setGroupMapData(data)
                         dataSet.add(groupData.groupModel)
                         doSubscribe()
                     }
@@ -499,6 +506,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onDeleteGroup(position: Int) {
         showDeleteGroupDialog(position)
     }
