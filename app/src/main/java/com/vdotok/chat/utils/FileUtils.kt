@@ -196,7 +196,7 @@ fun createAppDirectory(type: Int): String? {
 }
 
 fun createFileDirectory(type: Int, extension: String): File? {
-    val childName: String = System.currentTimeMillis().toString() + ".$extension"
+    val childName: String = System.currentTimeMillis().toString() + extension
     return File(
         createAppDirectory(type) + "/",
         childName

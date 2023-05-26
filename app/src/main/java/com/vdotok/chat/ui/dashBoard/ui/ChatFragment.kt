@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -360,28 +361,29 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        var fileExtension: String? = null
         if (resultCode == Activity.RESULT_OK) {
 
             when (requestCode) {
                 REQUEST_CODE_GALLERY -> {
-                    handleSelectionFromGallery(data)
+                    fileExtension = handleSelectionFromGallery(data)
                 }
                 REQUEST_CODE_VIDEO -> {
-                    handleSelectionFromVideos(data)
+                    fileExtension = handleSelectionFromVideos(data)
                 }
                 REQUEST_CODE_AUDIO -> {
-                    handleSelectionFromAudio(data)
+                    fileExtension = handleSelectionFromAudio(data)
                 }
                 CAMERA -> {
-                    handleSelectionFromCamera(data)
+                    fileExtension = handleSelectionFromCamera(data)
                 }
                 REQUEST_CODE_DOC -> {
-                    handleSelectionFromDocuments(data)
+                    fileExtension = handleSelectionFromDocuments(data)
                 }
             }
 
-            selectedFile?.let {
-                uploadFileToS3(it)
+            selectedFile?.let { file ->
+                fileExtension?.let { uploadFileToS3(file, it) }
             }
 
 //            groupModel?.let {
@@ -390,7 +392,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
         }
     }
 
-    private fun uploadFileToS3(selectedFile: File) {
+    private fun uploadFileToS3(selectedFile: File, fileExtension: String) {
         activity?.let { activity ->
             prefs.loginInfo?.authToken?.let { token ->
                 val type = RequestBody.create("type".toMediaTypeOrNull(), type)
@@ -398,7 +400,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
                 val filePart = MultipartBody.Part.createFormData(
                     "uploadFile",
                     ApplicationConstants.type,
-                    RequestBody.create(mimeTypeValue.toMediaTypeOrNull(), selectedFile)
+                    RequestBody.create(fileExtension.toMediaTypeOrNull(), selectedFile)
                 )
                 viewModel.uploadFile(type, filePart, authToken).observe(activity) { response ->
                     when (response) {
@@ -425,9 +427,9 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
 
     private fun getSubtype(filetype: String): Int {
         return when {
-            filetype.contains("image/jpeg") -> 0
+            filetype.contains("image/") -> 0
             filetype.contains("audio/") -> 1
-            filetype.contains("video/mp4") -> 2
+            filetype.contains("video/") -> 2
             filetype.contains("application/") || filetype.contains("text/") -> 3
             else -> 0
         }
@@ -460,7 +462,11 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
         startActivityForResult(intent, CAMERA)
     }
 
-    private fun handleSelectionFromGallery(data: Intent?) {
+    private fun handleSelectionFromGallery(data: Intent?):String {
+        mimeTypeValue = data?.data?.let { returnUri ->
+            val cr = context?.contentResolver
+            cr?.getType(returnUri)
+        }.toString()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             activity?.applicationContext?.let { context ->
                 val byteArray =
@@ -469,7 +475,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
                 saveFileToStorage(
                     byteArray!!,
                     "${System.currentTimeMillis()}",
-                    "image/jpeg",
+                    mimeTypeValue, //"image/jpeg",
                     "${Environment.DIRECTORY_PICTURES}/$directoryName",
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 )
@@ -477,26 +483,26 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
         } else {
             file = getFileData(activity as Context, data?.data, MediaType.IMAGE)
         }
+        selectedFile = file
+        fileType = 0
+        return mimeTypeValue
 
+    }
+
+    private fun handleSelectionFromVideos(data: Intent?): String {
         mimeTypeValue = data?.data?.let { returnUri ->
             val cr = context?.contentResolver
             cr?.getType(returnUri)
         }.toString()
-        selectedFile = file
-        fileType = 0
-
-    }
-
-    private fun handleSelectionFromVideos(data: Intent?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             activity?.applicationContext?.let { context ->
                 data?.data?.let { data ->
-                    VideoPath = ImageUtils.copyFileToInternalStorage(context, data, "video")
+                    VideoPath = copyFileToInternalStorage(context, data, "video")
                     val VideoBytes = converFileToByteArray(VideoPath)
                     saveFileToStorage(
                         VideoBytes!!,
                         "${System.currentTimeMillis()}",
-                        "video/mp4",
+                        mimeTypeValue, //"video/mp4",
                         "${Environment.DIRECTORY_MOVIES}/$directoryName",
                         MediaStore.Video.Media.EXTERNAL_CONTENT_URI
                     )
@@ -506,17 +512,17 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
         } else {
             file = getFileData(activity as Context, data?.data, MediaType.VIDEO)
         }
+        selectedFile = file
+        fileType = 2
+        return mimeTypeValue
 
+    }
+
+    private fun handleSelectionFromDocuments(data: Intent?): String {
         mimeTypeValue = data?.data?.let { returnUri ->
             val cr = context?.contentResolver
             cr?.getType(returnUri)
         }.toString()
-        selectedFile = file
-        fileType = 2
-
-    }
-
-    private fun handleSelectionFromDocuments(data: Intent?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             data?.data?.let { data ->
                 activity?.let { context ->
@@ -525,7 +531,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
                     saveFileToStorage(
                         FileBytes!!,
                         "${System.currentTimeMillis()}",
-                        "application/pdf",
+                        mimeTypeValue, //"application/pdf",
                         "${Environment.DIRECTORY_DOCUMENTS}/$directoryName",
                         MediaStore.Files.getContentUri("external")
                     )
@@ -534,17 +540,17 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
         } else {
             file = getFileData(activity as Context, data?.data, MediaType.FILE)
         }
+        selectedFile = file
+        fileType = 3
+        return mimeTypeValue
 
+    }
+
+    private fun handleSelectionFromCamera(data: Intent?): String {
         mimeTypeValue = data?.data?.let { returnUri ->
             val cr = context?.contentResolver
             cr?.getType(returnUri)
         }.toString()
-        selectedFile = file
-        fileType = 3
-
-    }
-
-    private fun handleSelectionFromCamera(data: Intent?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             activity?.applicationContext?.let { context ->
                 val byteArray = ImageUtils.convertBitmapToByteArray(
@@ -554,7 +560,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
                 saveFileToStorage(
                     byteArray!!,
                     "${System.currentTimeMillis()}",
-                    "image/jpeg",
+                    mimeTypeValue, //"image/jpeg",
                     "${Environment.DIRECTORY_PICTURES}/$directoryName",
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 )
@@ -567,17 +573,17 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
             )
 
         }
+        selectedFile = file
+        fileType = 0
+        return mimeTypeValue
 
+    }
+
+    private fun handleSelectionFromAudio(data: Intent?): String {
         mimeTypeValue = data?.data?.let { returnUri ->
             val cr = context?.contentResolver
             cr?.getType(returnUri)
         }.toString()
-        selectedFile = file
-        fileType = 0
-
-    }
-
-    private fun handleSelectionFromAudio(data: Intent?) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             activity?.applicationContext?.let { context ->
                 data?.data?.let { data ->
@@ -586,7 +592,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
                     saveFileToStorage(
                         AudioBytes!!,
                         "${System.currentTimeMillis()}",
-                        "audio/x-wav",
+                        mimeTypeValue, //"audio/x-wav",
                         "${Environment.DIRECTORY_MUSIC}/$directoryName",
                         MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
                     )
@@ -596,13 +602,9 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
             file = getFileData(activity as Context, data?.data, MediaType.AUDIO)
 
         }
-
-        mimeTypeValue = data?.data?.let { returnUri ->
-            val cr = context?.contentResolver
-            cr?.getType(returnUri)
-        }.toString()
         selectedFile = file
         fileType = 1
+        return mimeTypeValue
     }
 
     /**
@@ -630,14 +632,15 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
 
     private fun downloadFileToStorage(message: Message) {
         Thread {
-            val fileExtension =
-                getMimeType(message.subType).substring(getMimeType(message.subType).indexOf("/") + 1)
+//            val fileExtension =
+//                getMimeType(message.subType).substring(getMimeType(message.subType).indexOf("/") + 1)
             val downloadUrl = if (message.content.contains("https")) Uri.parse(
                 message.content.replace(
                     "https",
                     "http"
                 )
             ) else Uri.parse(message.content)
+            val fileExtension = downloadUrl.toString().replaceBeforeLast(".","")
 
             Log.e(
                 "fileDownload",
@@ -648,12 +651,11 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
                 .setDescription("Downloading File.....")
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 .setAllowedOverMetered(true)
-                .setMimeType(fileExtension)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 request.setDestinationInExternalPublicDir(
                     Environment.DIRECTORY_DOWNLOADS,
-                    "${createFileDirectoryForAndroid10(message.subType)}/${System.currentTimeMillis()}.$fileExtension"
+                    "${createFileDirectoryForAndroid10(message.subType)}/${System.currentTimeMillis()}$fileExtension"
                 )
             } else {
                 request.setDestinationUri(
@@ -784,7 +786,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
         pickPhoto.type = "image/*"
         pickPhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         pickPhoto.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-        startActivityForResult(pickPhoto, ApplicationConstants.REQUEST_CODE_GALLERY)
+        startActivityForResult(pickPhoto, REQUEST_CODE_GALLERY)
     }
 
     private fun selectAudio() {
