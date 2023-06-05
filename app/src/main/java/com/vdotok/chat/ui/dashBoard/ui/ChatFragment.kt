@@ -547,10 +547,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
     }
 
     private fun handleSelectionFromCamera(data: Intent?): String {
-        mimeTypeValue = data?.data?.let { returnUri ->
-            val cr = context?.contentResolver
-            cr?.getType(returnUri)
-        }.toString()
+        mimeTypeValue = "image/jpeg"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             activity?.applicationContext?.let { context ->
                 val byteArray = ImageUtils.convertBitmapToByteArray(
@@ -560,7 +557,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
                 saveFileToStorage(
                     byteArray!!,
                     "${System.currentTimeMillis()}",
-                    mimeTypeValue, //"image/jpeg",
+                    "image/jpeg",
                     "${Environment.DIRECTORY_PICTURES}/$directoryName",
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 )
