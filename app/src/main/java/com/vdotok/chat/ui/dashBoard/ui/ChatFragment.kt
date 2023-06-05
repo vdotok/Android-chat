@@ -46,6 +46,7 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.*
 import java.util.*
 import kotlin.concurrent.timerTask
@@ -383,6 +384,7 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
             }
 
             selectedFile?.let { file ->
+                fileExtension = getFileExtension(file)
                 fileExtension?.let { uploadFileToS3(file, it) }
             }
 
@@ -397,12 +399,14 @@ class ChatFragment : ChatMangerListenerFragment(), OnMediaItemClickCallbackListn
             prefs.loginInfo?.authToken?.let { token ->
                 val type = RequestBody.create("type".toMediaTypeOrNull(), type)
                 val authToken = RequestBody.create("auth_token".toMediaTypeOrNull(), token)
+                val extension = RequestBody.create("extension".toMediaTypeOrNull(), fileExtension)
+                val fileType = fileExtension.toMediaTypeOrNull()
                 val filePart = MultipartBody.Part.createFormData(
                     "uploadFile",
                     ApplicationConstants.type,
-                    RequestBody.create(fileExtension.toMediaTypeOrNull(), selectedFile)
+                    selectedFile.asRequestBody(fileType)
                 )
-                viewModel.uploadFile(type, filePart, authToken).observe(activity) { response ->
+                viewModel.uploadFile(type, filePart, authToken, extension).observe(activity) { response ->
                     when (response) {
                         Result.Loading -> {
                             binding.progressBar.toggleVisibility()

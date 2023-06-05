@@ -242,3 +242,7 @@ fun saveFileDataOnExternalData(filePath: String, fileData: ByteArray?): File? {
     return null
     // File Not Saved
 }
+
+fun getFileExtension(selectedFile: File): String {
+    return selectedFile.name.substringAfter(".")
+}

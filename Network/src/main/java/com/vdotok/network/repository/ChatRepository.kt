@@ -18,10 +18,11 @@ class ChatRepository @Inject constructor(
     suspend fun uploadFile(
         type: RequestBody,
         file: MultipartBody.Part?,
-        auth_token: RequestBody
+        auth_token: RequestBody,
+        extension: RequestBody
     ): Result<UploadFileResponse> {
         return safeApiCall(dispatcher) {
-            apiService.uploadImage(type, file, auth_token)
+            apiService.uploadImage(type, file, auth_token, extension)
         }
     }
 
