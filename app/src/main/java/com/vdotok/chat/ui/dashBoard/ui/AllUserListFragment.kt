@@ -1,11 +1,13 @@
 package com.vdotok.chat.ui.dashBoard.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.databinding.ObservableField
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -41,6 +43,7 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
 
     private var edtSearch = ObservableField<String>()
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -192,6 +195,7 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun getAllUsers() {
         binding.progressBar.toggleVisibility()
         activity?.let { activity ->
@@ -215,22 +219,22 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
     }
 
     private fun textListenerForSearch() {
-        binding.searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(
-                s: CharSequence,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
-            }
+            binding.searchEditText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
-            override fun afterTextChanged(s: Editable) {
-                adapter.filter?.filter(s)
-            }
-        })
-    }
+                override fun afterTextChanged(s: Editable) {
+                   adapter.filter?.filter(s)
+                }
+            })
+        }
 
     private fun openChatFragment(groupModel: GroupModel?) {
         val bundle = Bundle()
@@ -239,8 +243,11 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun populateDataToList(response: GetAllUsersResponseModel) {
-        adapter.updateData(response.users)
+        val list = response.users as ArrayList<UserModel>
+        list.removeIf { it.refID == prefs.loginInfo?.refId }
+        adapter.updateData(list)
     }
 
     override fun onItemClick(position: Int) {

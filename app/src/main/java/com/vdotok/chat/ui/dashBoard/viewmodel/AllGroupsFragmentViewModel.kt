@@ -10,15 +10,17 @@ import com.vdotok.network.repository.GroupRepository
 
 class AllGroupsFragmentViewModel: ViewModel() {
 
-    private val service = RetrofitModule.provideRetrofitService()
-    private val groupRepo = GroupRepository(service)
 
     fun getAllGroups(token: String) = liveData {
+        val service = RetrofitModule.provideRetrofitService()
+        val groupRepo = GroupRepository(service)
         emit(Result.Loading)
         emit(groupRepo.getAllGroups(token))
     }
 
     fun deleteGroup(token: String, model: DeleteGroupModel) = liveData {
+        val service = RetrofitModule.provideRetrofitService()
+        val groupRepo = GroupRepository(service)
         emit(Result.Loading)
         emit(groupRepo.deleteGroup(token, model))
     }

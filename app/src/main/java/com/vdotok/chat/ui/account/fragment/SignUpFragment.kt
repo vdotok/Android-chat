@@ -1,6 +1,7 @@
 package com.vdotok.chat.ui.account.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,21 +9,23 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
+import com.google.gson.Gson
+import com.google.zxing.integration.android.IntentIntegrator
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.LayoutFragmentSignupBinding
 import com.vdotok.chat.extensions.*
+import com.vdotok.chat.models.QRCodeModel
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.account.viewmodel.AccountViewModel
 import com.vdotok.chat.ui.dashBoard.ui.DashboardActivity
+import com.vdotok.chat.utils.*
 import com.vdotok.chat.utils.ApplicationConstants.PROJECT_ID
-import com.vdotok.chat.utils.disable
-import com.vdotok.chat.utils.enable
-import com.vdotok.chat.utils.saveResponseToPrefs
 import com.vdotok.network.models.LoginResponse
 import com.vdotok.network.models.SignUpModel
 import com.vdotok.network.network.HttpResponseCodes
 import com.vdotok.network.network.NetworkConnectivity
 import com.vdotok.network.network.Result
+import com.vdotok.network.utils.Constants
 
 
 /**
@@ -67,6 +70,12 @@ class SignUpFragment: Fragment() {
             moveToLogin(it)
         }
 
+        binding.scanner.performSingleClick{
+            activity?.runOnUiThread {
+                qrCodeScannerLauncher.launch(IntentIntegrator.forSupportFragment(this))
+            }
+        }
+
         configureBackPress()
     }
 
@@ -103,6 +112,22 @@ class SignUpFragment: Fragment() {
         }
     }
 
+    private val qrCodeScannerLauncher = registerForActivityResult(QrCodeScannerContract()) {
+        if (!it.contents.isNullOrEmpty()) {
+            Log.d("RESULT_INTENT", it.contents)
+            val data: QRCodeModel? = Gson().fromJson(it.contents, QRCodeModel::class.java)
+            prefs.userProjectId = data?.project_id.toString()
+            prefs.userBaseUrl = data?.tenant_api_url.toString()
+            if (!prefs.userProjectId.isNullOrEmpty() && !prefs.userBaseUrl.isNullOrEmpty()) {
+                PROJECT_ID = prefs.userProjectId.toString()
+                Constants.BASE_URL = prefs.userBaseUrl.toString()
+            }
+            Log.d("RESULT_INTENT", data.toString())
+        } else {
+            binding.root.showSnackBar("QR CODE is not correct!!!")
+        }
+    }
+
 
     private fun signUp() {
         binding.btnSignUp.disable()
@@ -113,7 +138,7 @@ class SignUpFragment: Fragment() {
                     viewModel.fullName.get().toString(),
                     viewModel.email.get().toString(),
                     viewModel.password.get().toString(),
-                    project_id = PROJECT_ID
+                    project_id = prefs.userProjectId.toString()
                 )
             ).observe(viewLifecycleOwner) {
                 binding.btnSignUp.enable()

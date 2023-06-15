@@ -29,6 +29,11 @@
             android:launchMode="singleTask"/>
         <activity android:name="com.vdotok.chat.ui.dashBoard.ui.DashboardActivity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="android:screenOrientation"
+            android:stateNotNeeded="true"/>
         <activity android:name="com.vdotok.chat.ui.splash.ui.SplashActivity"
             android:theme="@style/Theme.AccountScreen"
             android:screenOrientation="portrait">

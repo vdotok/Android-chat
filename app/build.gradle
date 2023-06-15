@@ -93,4 +93,7 @@ dependencies {
         exclude group: 'glide-parent'
     }
 
+    implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
+    implementation 'com.android.support:multidex:1.0.3'
+
 }

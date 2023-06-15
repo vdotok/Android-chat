@@ -19,10 +19,7 @@ import com.vdotok.chat.databinding.ActivityDashboardBinding
 import com.vdotok.chat.extensions.showSnackBar
 import com.vdotok.chat.interfaces.FragmentRefreshListener
 import com.vdotok.chat.prefs.Prefs
-import com.vdotok.chat.utils.ImageUtils
-import com.vdotok.chat.utils.NetworkStatusLiveData
-import com.vdotok.chat.utils.createAppDirectory
-import com.vdotok.chat.utils.saveFileDataOnExternalData
+import com.vdotok.chat.utils.*
 import com.vdotok.connect.manager.ChatManager
 import com.vdotok.connect.manager.ChatManagerCallback
 import com.vdotok.connect.models.*
@@ -110,6 +107,7 @@ class DashboardActivity : AppCompatActivity(), ChatManagerCallback {
 
     private fun initChatManager() {
         chatManger = ChatManager.getInstance(this)
+        chatManger?.setConstants(prefs.userProjectId.toString())
         chatManger?.setIsSenderReceiveFilePackets(false)
         chatManger?.listener = this
         connect()

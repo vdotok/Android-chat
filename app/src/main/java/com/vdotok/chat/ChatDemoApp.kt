@@ -2,16 +2,31 @@ package com.vdotok.chat
 
 import android.app.Application
 import android.content.res.Configuration
+import com.vdotok.chat.prefs.Prefs
 import com.vdotok.connect.manager.ChatManager
 import com.vdotok.chat.utils.ApplicationConstants
+import com.vdotok.chat.utils.ApplicationConstants.PROJECT_ID
+import com.vdotok.network.utils.Constants
+import com.vdotok.network.utils.Constants.BASE_URL
 
 class ChatDemoApp : Application() {
     // Called when the application is starting, before any other application objects have been created.
     // Overriding this method is totally optional!
+
+    private lateinit var prefs : Prefs
     override fun onCreate() {
         super.onCreate()
+        prefs = Prefs(this)
         // Required initialization logic here!
-        ChatManager.getInstance(this).setConstants(ApplicationConstants.PROJECT_ID)
+        setVariables()
+    }
+
+    private fun setVariables() {
+        if (!prefs.userProjectId.isNullOrEmpty() && !prefs.userBaseUrl.isNullOrEmpty()) {
+            BASE_URL = prefs.userBaseUrl.toString()
+            PROJECT_ID = prefs.userProjectId.toString()
+        }
+        ChatManager.getInstance(this).setConstants(PROJECT_ID)
     }
     // Called by the system when the device configuration changes while your component is running.
     // Overriding this method is totally optional!
