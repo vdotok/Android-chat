@@ -65,6 +65,7 @@
     <string name="select_contact">Select Contact</string>
     <string name="blank" />
     <string name="no_internet">No Internet Connection</string>
+    <string name="api_url_empty">Api Url is Empty!</string>
 
 
     <string name="in_progress">In progress!</string>

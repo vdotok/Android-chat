@@ -33,7 +33,7 @@ import com.vdotok.network.utils.Constants
  * Date & Time: On 5/3/21 At 1:26 PM in 2021
  */
 
-class SignUpFragment: Fragment() {
+class SignUpFragment : Fragment() {
 
     private lateinit var prefs: Prefs
     private lateinit var binding: LayoutFragmentSignupBinding
@@ -60,9 +60,12 @@ class SignUpFragment: Fragment() {
         //  binding.customToolbar.title.text = getString(R.string.register_user)
 
         binding.btnSignUp.setOnClickListener {
-            if (it.checkedUserName(viewModel.fullName.get().toString()) && it.checkedPassword(viewModel.password.get().toString()) && it.checkedEmail(viewModel.email.get().toString())) {
-                checkUserEmail(viewModel.email.get().toString())
+            if (it.checkedUserName(viewModel.fullName.get().toString()) && it.checkedPassword(
+                    viewModel.password.get().toString()
+                ) && it.checkedEmail(viewModel.email.get().toString())
+            ) {
                 binding.btnSignUp.disable()
+                checkUserEmail(viewModel.email.get().toString())
             }
         }
 
@@ -70,7 +73,7 @@ class SignUpFragment: Fragment() {
             moveToLogin(it)
         }
 
-        binding.scanner.performSingleClick{
+        binding.scanner.performSingleClick {
             activity?.runOnUiThread {
                 qrCodeScannerLauncher.launch(IntentIntegrator.forSupportFragment(this))
             }
@@ -81,32 +84,35 @@ class SignUpFragment: Fragment() {
 
     private fun checkUserEmail(email: String) {
         activity?.let { activity ->
-
-            viewModel.checkEmailExist(email).observe(viewLifecycleOwner) {
-                binding.btnSignUp.enable()
-                when (it) {
-                    Result.Loading -> {
-                        binding.progressBar.toggleVisibility()
-                    }
-                    is Result.Success ->  {
-                        binding.progressBar.toggleVisibility()
-                        handleCheckFullNameResponse(it.data)
-                    }
-                    is Result.Failure -> {
-                        binding.progressBar.toggleVisibility()
-                        if (NetworkConnectivity.isNetworkAvailable(activity).not())
-                            binding.root.showSnackBar(getString(R.string.no_network_available))
-                        else
-                            binding.root.showSnackBar(it.exception.message)
+            if (prefs.userProjectId.toString().isNotEmpty()) {
+                viewModel.checkEmailExist(email).observe(viewLifecycleOwner) {
+                    binding.btnSignUp.enable()
+                    when (it) {
+                        Result.Loading -> {
+                            binding.progressBar.toggleVisibility()
+                        }
+                        is Result.Success -> {
+                            binding.progressBar.toggleVisibility()
+                            handleCheckFullNameResponse(it.data)
+                        }
+                        is Result.Failure -> {
+                            binding.progressBar.toggleVisibility()
+                            if (NetworkConnectivity.isNetworkAvailable(activity).not())
+                                binding.root.showSnackBar(getString(R.string.no_network_available))
+                            else
+                                binding.root.showSnackBar(it.exception.message)
+                        }
                     }
                 }
-
+            } else {
+                binding.root.showSnackBar(getString(R.string.api_url_empty))
+                binding.btnSignUp.enable()
             }
         }
     }
 
     private fun handleCheckFullNameResponse(response: LoginResponse) {
-        when(response.status) {
+        when (response.status) {
             HttpResponseCodes.SUCCESS.value -> signUp()
             else -> binding.root.showSnackBar(response.message)
         }
@@ -131,42 +137,50 @@ class SignUpFragment: Fragment() {
 
     private fun signUp() {
         binding.btnSignUp.disable()
-
-        activity?.let { activity ->
-            viewModel.signUp(
-                SignUpModel(
-                    viewModel.fullName.get().toString(),
-                    viewModel.email.get().toString(),
-                    viewModel.password.get().toString(),
-                    project_id = prefs.userProjectId.toString()
-                )
-            ).observe(viewLifecycleOwner) {
-                binding.btnSignUp.enable()
-                when (it) {
-                    Result.Loading -> {
-                        binding.progressBar.toggleVisibility()
-                    }
-                    is Result.Success -> {
-                        binding.progressBar.toggleVisibility()
-                        handleLoginResponse(it.data)
-                    }
-                    is Result.Failure -> {
-                        binding.progressBar.toggleVisibility()
-                        if (NetworkConnectivity.isNetworkAvailable(activity).not())
-                            binding.root.showSnackBar(getString(R.string.no_network_available))
-                        else
-                            binding.root.showSnackBar(it.exception.message)
+        if (prefs.userProjectId.toString().isNotEmpty()) {
+            activity?.let { activity ->
+                viewModel.signUp(
+                    SignUpModel(
+                        viewModel.fullName.get().toString(),
+                        viewModel.email.get().toString(),
+                        viewModel.password.get().toString(),
+                        project_id = prefs.userProjectId.toString()
+                    )
+                ).observe(viewLifecycleOwner) {
+                    binding.btnSignUp.enable()
+                    when (it) {
+                        Result.Loading -> {
+                            binding.progressBar.toggleVisibility()
+                        }
+                        is Result.Success -> {
+                            binding.progressBar.toggleVisibility()
+                            handleLoginResponse(it.data)
+                        }
+                        is Result.Failure -> {
+                            binding.progressBar.toggleVisibility()
+                            if (NetworkConnectivity.isNetworkAvailable(activity).not())
+                                binding.root.showSnackBar(getString(R.string.no_network_available))
+                            else
+                                binding.root.showSnackBar(it.exception.message)
+                        }
                     }
                 }
             }
+        } else {
+            binding.root.showSnackBar(getString(R.string.api_url_empty))
+            binding.btnSignUp.enable()
         }
     }
 
     private fun handleLoginResponse(response: LoginResponse) {
-        when(response.status) {
+        when (response.status) {
             HttpResponseCodes.SUCCESS.value -> {
                 saveResponseToPrefs(prefs, response)
-                startActivity(activity?.applicationContext?.let { DashboardActivity.createDashboardActivity(it) })
+                startActivity(activity?.applicationContext?.let {
+                    DashboardActivity.createDashboardActivity(
+                        it
+                    )
+                })
             }
             else -> {
                 binding.root.showSnackBar(response.message)
@@ -180,7 +194,7 @@ class SignUpFragment: Fragment() {
 
     private fun configureBackPress() {
         requireActivity().onBackPressedDispatcher
-            .addCallback(viewLifecycleOwner, object: OnBackPressedCallback(true) {
+            .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     moveToLogin(binding.root)
                 }

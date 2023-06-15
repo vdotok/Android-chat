@@ -33,7 +33,7 @@ import com.vdotok.network.utils.Constants
  * Created By: Vdotok
  * Date & Time: On 5/3/21 At 1:26 PM in 2021
  */
-class LoginFragment: Fragment() {
+class LoginFragment : Fragment() {
 
     private lateinit var binding: LayoutFragmentLoginBinding
     private lateinit var prefs: Prefs
@@ -59,7 +59,7 @@ class LoginFragment: Fragment() {
 
         prefs = Prefs(activity)
 
-        binding.scanner.performSingleClick{
+        binding.scanner.performSingleClick {
             activity?.runOnUiThread {
                 qrCodeScannerLauncher.launch(IntentIntegrator.forSupportFragment(this))
             }
@@ -77,11 +77,14 @@ class LoginFragment: Fragment() {
     }
 
     private fun validateFields(view: View): Boolean {
-        return view.checkedPassword(viewModel.password.get().toString()) && checkValidation(view, viewModel.email.get().toString())
+        return view.checkedPassword(viewModel.password.get().toString()) && checkValidation(
+            view,
+            viewModel.email.get().toString()
+        )
     }
 
     private fun handleLoginResponse(response: LoginResponse) {
-        when(response.status) {
+        when (response.status) {
             HttpResponseCodes.SUCCESS.value -> {
                 saveResponseToPrefs(prefs, response)
                 startActivity(activity?.applicationContext?.let { createDashboardActivity(it) })
@@ -92,43 +95,47 @@ class LoginFragment: Fragment() {
         }
     }
 
-    private val qrCodeScannerLauncher = registerForActivityResult(QrCodeScannerContract()){
-        if (!it.contents.isNullOrEmpty()){
+    private val qrCodeScannerLauncher = registerForActivityResult(QrCodeScannerContract()) {
+        if (!it.contents.isNullOrEmpty()) {
             Log.e("RESULT_INTENT", it.contents)
             val data: QRCodeModel? = Gson().fromJson(it.contents, QRCodeModel::class.java)
             prefs.userProjectId = data?.project_id.toString().trim()
             prefs.userBaseUrl = data?.tenant_api_url.toString().trim()
-            if (!prefs.userProjectId.isNullOrEmpty() &&   !prefs.userBaseUrl.isNullOrEmpty()){
+            if (!prefs.userProjectId.isNullOrEmpty() && !prefs.userBaseUrl.isNullOrEmpty()) {
                 PROJECT_ID = prefs.userProjectId.toString().trim()
-                Constants.BASE_URL =  prefs.userBaseUrl.toString().trim()
+                Constants.BASE_URL = prefs.userBaseUrl.toString().trim()
             }
-            Log.d("RESULT_INTENT",data.toString())
-        }else{
+            Log.d("RESULT_INTENT", data.toString())
+        } else {
             binding.root.showSnackBar("QR CODE is not correct!!!")
         }
     }
 
 
-    private fun loginV2(){
-
+    private fun loginV2() {
         binding.signInBtn.disable()
         activity?.let { activity ->
-            viewModel.loginUser(prefs.userProjectId.toString()).observe(activity) {
-                binding.signInBtn.enable()
-                when (it) {
-                    Result.Loading -> {
-                        binding.progressBar.toggleVisibility()
-                    }
-                    is Result.Success ->  {
-                        binding.progressBar.toggleVisibility()
-                        handleLoginResponse(it.data)
-                    }
-                    is Result.Failure -> {
-                        binding.progressBar.toggleVisibility()
-                        if(NetworkConnectivity.isNetworkAvailable(activity).not())
-                            binding.root.showSnackBar(getString(R.string.no_internet))
+            if (prefs.userProjectId.toString().isNotEmpty()) {
+                viewModel.loginUser(prefs.userProjectId.toString()).observe(activity) {
+                    binding.signInBtn.enable()
+                    when (it) {
+                        Result.Loading -> {
+                            binding.progressBar.toggleVisibility()
+                        }
+                        is Result.Success -> {
+                            binding.progressBar.toggleVisibility()
+                            handleLoginResponse(it.data)
+                        }
+                        is Result.Failure -> {
+                            binding.progressBar.toggleVisibility()
+                            if (NetworkConnectivity.isNetworkAvailable(activity).not())
+                                binding.root.showSnackBar(getString(R.string.no_internet))
+                        }
                     }
                 }
+            } else {
+                binding.root.showSnackBar(getString(R.string.api_url_empty))
+                binding.signInBtn.enable()
             }
         }
     }
