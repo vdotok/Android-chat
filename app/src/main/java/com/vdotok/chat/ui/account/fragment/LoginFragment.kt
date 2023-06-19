@@ -115,8 +115,8 @@ class LoginFragment : Fragment() {
     private fun loginV2() {
         binding.signInBtn.disable()
         activity?.let { activity ->
-            if (prefs.userProjectId.toString().isNotEmpty()) {
-                viewModel.loginUser(prefs.userProjectId.toString()).observe(activity) {
+            if (PROJECT_ID.isNotEmpty() && Constants.BASE_URL.isNotEmpty()) {
+                viewModel.loginUser(PROJECT_ID).observe(activity) {
                     binding.signInBtn.enable()
                     when (it) {
                         Result.Loading -> {

@@ -26,6 +26,7 @@ import com.vdotok.network.network.HttpResponseCodes
 import com.vdotok.network.network.NetworkConnectivity
 import com.vdotok.network.network.Result
 import com.vdotok.network.utils.Constants
+import com.vdotok.network.utils.Constants.BASE_URL
 
 
 /**
@@ -84,7 +85,7 @@ class SignUpFragment : Fragment() {
 
     private fun checkUserEmail(email: String) {
         activity?.let { activity ->
-            if (prefs.userProjectId.toString().isNotEmpty()) {
+            if (PROJECT_ID.isNotEmpty() && BASE_URL.isNotEmpty()) {
                 viewModel.checkEmailExist(email).observe(viewLifecycleOwner) {
                     binding.btnSignUp.enable()
                     when (it) {
@@ -137,14 +138,14 @@ class SignUpFragment : Fragment() {
 
     private fun signUp() {
         binding.btnSignUp.disable()
-        if (prefs.userProjectId.toString().isNotEmpty()) {
+        if (PROJECT_ID.isNotEmpty() && BASE_URL.isNotEmpty()) {
             activity?.let { activity ->
                 viewModel.signUp(
                     SignUpModel(
                         viewModel.fullName.get().toString(),
                         viewModel.email.get().toString(),
                         viewModel.password.get().toString(),
-                        project_id = prefs.userProjectId.toString()
+                        project_id = PROJECT_ID
                     )
                 ).observe(viewLifecycleOwner) {
                     binding.btnSignUp.enable()

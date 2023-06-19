@@ -22,7 +22,11 @@ class ChatDemoApp : Application() {
     }
 
     private fun setVariables() {
-        if (!prefs.userProjectId.isNullOrEmpty() && !prefs.userBaseUrl.isNullOrEmpty()) {
+//        if project id is set inside the files
+        if (BASE_URL.isNotEmpty() && PROJECT_ID.isNotEmpty()) {
+            prefs.userBaseUrl = BASE_URL
+            prefs.userProjectId = PROJECT_ID
+        } else { // value exists in prefs
             BASE_URL = prefs.userBaseUrl.toString()
             PROJECT_ID = prefs.userProjectId.toString()
         }
