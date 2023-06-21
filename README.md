@@ -24,7 +24,7 @@ IDE Installation & Build Guide
 Bravo! You’ve successfully configured the project in Android Studio.
 
 <b>Download Connect Lib:</b>
-* Use the following link to get the latest aar: https://sdk.vdotok.com/Android-SDKs/connect.aar 
+* Use the following link to get the latest aar: https://sdk.vdotok.com/ 
 
 <b>Configure Lib:</b>
 * In <b> Android Studio File Explorer</b>, select <b>Project</b>
