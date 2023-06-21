@@ -10,16 +10,15 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.vdotok.connect.models.MediaType
 import com.vdotok.chat.utils.ApplicationConstants.AUDIO_DIRECTORY
 import com.vdotok.chat.utils.ApplicationConstants.DOCS_DIRECTORY
 import com.vdotok.chat.utils.ApplicationConstants.IMAGES_DIRECTORY
 import com.vdotok.chat.utils.ApplicationConstants.VIDEO_DIRECTORY
 import com.vdotok.chat.utils.ImageUtils.copyFileToInternalStorage
+import com.vdotok.connect.models.MediaType
 import java.io.*
 import java.nio.file.Files
 import java.nio.file.Paths
-import kotlin.jvm.Throws
 
 
 /**
@@ -100,7 +99,7 @@ fun getPathFromInputStreamUri(context: Context, uri: Uri, type: MediaType): File
     uri.authority?.let {
         try {
             inputStream = context.contentResolver.openInputStream(uri)
-            extFile = File(copyFileToInternalStorage(context,uri,"temp"))
+            extFile = File(copyFileToInternalStorage(context, uri, "temp"))
             photoFile = createTemporalFileFrom(inputStream, type, extFile?.extension!!)
         } catch (ignored: IOException) {
             ignored.printStackTrace()
@@ -116,19 +115,21 @@ fun getPathFromInputStreamUri(context: Context, uri: Uri, type: MediaType): File
 }
 
 
-
-
 /**
  * Function to create a temp file in external storage
  * @return Returns a file
  * */
 @Throws(IOException::class)
-private fun createTemporalFileFrom(inputStream: InputStream?, type: MediaType, extension: String): File? {
+private fun createTemporalFileFrom(
+    inputStream: InputStream?,
+    type: MediaType,
+    extension: String
+): File? {
     var targetFile: File? = null
     if (inputStream != null) {
         var read: Int
         val buffer = ByteArray(8 * 1024)
-        targetFile = getImageFile(type,extension)
+        targetFile = getImageFile(type, extension)
         val outputStream: OutputStream = FileOutputStream(targetFile)
         while (inputStream.read(buffer).also { read = it } != -1) {
             outputStream.write(buffer, 0, read)
@@ -150,7 +151,7 @@ private fun createTemporalFileFrom(inputStream: InputStream?, type: MediaType, e
  * @param reqHeight required height of the resource
  * @return Return Bitmap type object
  * */
- fun getBitmap(file: File, reqWidth: Int, reqHeight: Int): Bitmap? {
+fun getBitmap(file: File, reqWidth: Int, reqHeight: Int): Bitmap? {
     val options = BitmapFactory.Options()
     options.inSampleSize = ImageUtils.calculateInSampleSize(options, reqWidth, reqHeight)
     options.inJustDecodeBounds = false
@@ -194,6 +195,25 @@ fun createAppDirectory(type: Int): String? {
     return dir?.absolutePath
 }
 
+fun createFileDirectory(type: Int, extension: String): File? {
+    val childName: String = System.currentTimeMillis().toString() + extension
+    return File(
+        createAppDirectory(type) + "/",
+        childName
+    )
+}
+
+fun createFileDirectoryForAndroid10(type: Int): String {
+    val newDirName = when (type) {
+        MediaType.IMAGE.value -> "Vdotok$IMAGES_DIRECTORY"
+        MediaType.VIDEO.value -> "Vdotok$VIDEO_DIRECTORY"
+        MediaType.AUDIO.value -> "Vdotok$AUDIO_DIRECTORY"
+        MediaType.FILE.value -> "Vdotok$DOCS_DIRECTORY"
+        else -> "Vdotok$IMAGES_DIRECTORY"
+    }
+    return newDirName
+}
+
 /**
  * Function to save Image on External storage
  * @param filePath String file path of the image
@@ -221,4 +241,9 @@ fun saveFileDataOnExternalData(filePath: String, fileData: ByteArray?): File? {
     }
     return null
     // File Not Saved
+
+}
+
+fun getFileExtension(selectedFile: File): String {
+    return selectedFile.name.substringAfter(".")
 }

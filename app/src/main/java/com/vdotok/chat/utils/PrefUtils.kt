@@ -1,7 +1,7 @@
 package com.vdotok.chat.utils
 
-import com.vdotok.connect.models.Connection
 import com.vdotok.chat.prefs.Prefs
+import com.vdotok.connect.models.Connection
 import com.vdotok.network.models.LoginResponse
 
 fun saveResponseToPrefs(prefs: Prefs, response: LoginResponse?) {

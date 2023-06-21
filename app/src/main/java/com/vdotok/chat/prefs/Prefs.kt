@@ -9,6 +9,8 @@ import com.vdotok.chat.utils.ApplicationConstants.GROUP_MODEL_KEY
 import com.vdotok.chat.utils.ApplicationConstants.LOGIN_INFO
 import com.vdotok.chat.utils.ApplicationConstants.PRESENCE_MODEL_KEY
 import com.vdotok.chat.utils.ApplicationConstants.SOCKET_CONNECTION
+import com.vdotok.chat.utils.ApplicationConstants.USER_BASE
+import com.vdotok.chat.utils.ApplicationConstants.USER_PROJECT
 import com.vdotok.connect.models.Connection
 import com.vdotok.network.models.GroupModel
 import com.vdotok.network.models.LoginResponse
@@ -23,6 +25,27 @@ import java.lang.reflect.Type
  */
 class Prefs(context: Context?) {
     private val mPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+
+    var userProjectId: String?
+        get(){
+            return mPrefs.getString(USER_PROJECT, "")
+        }
+        set(userInfo) {
+            val mEditor: SharedPreferences.Editor = mPrefs.edit()
+            mEditor.putString(USER_PROJECT, userInfo)
+            mEditor.apply()
+        }
+
+    var userBaseUrl: String?
+        get(){
+            return mPrefs.getString(USER_BASE, "")
+        }
+        set(userInfo) {
+            val mEditor: SharedPreferences.Editor = mPrefs.edit()
+            mEditor.putString(USER_BASE, userInfo)
+            mEditor.apply()
+        }
+
 
     var mConnection: Connection?
         get(){

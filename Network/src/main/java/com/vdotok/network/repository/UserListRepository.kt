@@ -1,8 +1,6 @@
 package com.vdotok.network.repository
 
 import com.vdotok.network.models.GetAllUsersResponseModel
-import com.vdotok.network.models.LoginResponse
-import com.vdotok.network.models.LoginUserModel
 import com.vdotok.network.network.Result
 import com.vdotok.network.network.api.ApiService
 import com.vdotok.network.network.safeApiCall

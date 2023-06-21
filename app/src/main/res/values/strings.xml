@@ -27,7 +27,8 @@
     <string name="no_user_select">No User Selected</string>
     <string name="Vdotok">Vdotok</string>
     <string name="confirm">Confirm</string>
-    <string name="read">Read %s</string>
+    <string name="read">Read</string>
+    <string name="read_count">Read %s</string>
     <string name="video_file">Video File</string>
     <string name="doc_file">Document File</string>
     <string name="audio_file">Audio File</string>
@@ -60,10 +61,11 @@
     <string name="no_conversation_yet">No Conversation Yet</string>
     <string name="no_conversation_detail">Tap and hold on any message\nto star it, so you can easily find it later.</string>
     <string name="contacts">Contacts</string>
-    <string name="sign_up_to_your_account">Sign Up to your account</string>
+    <string name="sign_up_to_your_account">Sign Up</string>
     <string name="select_contact">Select Contact</string>
     <string name="blank" />
     <string name="no_internet">No Internet Connection</string>
+    <string name="api_url_empty">Api Url is Empty!</string>
 
 
     <string name="in_progress">In progress!</string>

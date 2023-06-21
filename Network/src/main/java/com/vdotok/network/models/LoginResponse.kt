@@ -35,7 +35,7 @@ class LoginResponse {
     var userId: String? = null
 
     @SerializedName("media_server_map")
-    val mediaServer: MessagingServerMap? = null
+    val mediaServer: MediaServerMap? = null
 
     @SerializedName("messaging_server_map")
     val messagingServer: MessagingServerMap? = null

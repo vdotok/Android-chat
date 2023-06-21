@@ -11,16 +11,17 @@ import com.vdotok.network.repository.UserListRepository
 
 class AllUserListFragmentViewModel: ViewModel() {
 
-    private val service = RetrofitModule.provideRetrofitService()
-    private val groupRepo = GroupRepository(service)
-    private val userListRepo = UserListRepository(service)
 
     fun createGroup(token: String, model: CreateGroupModel) = liveData {
+        val service = RetrofitModule.provideRetrofitService()
+        val groupRepo = GroupRepository(service)
         emit(Result.Loading)
         emit(groupRepo.createGroup(token, model))
     }
 
     fun getAllUsers(token: String) = liveData {
+        val service = RetrofitModule.provideRetrofitService()
+        val userListRepo = UserListRepository(service)
         emit(Result.Loading)
         emit(userListRepo.getAllUsers(token))
     }

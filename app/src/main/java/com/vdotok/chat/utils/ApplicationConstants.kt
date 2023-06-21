@@ -8,8 +8,9 @@ package com.vdotok.chat.utils
 object ApplicationConstants {
 
     //    SDK AUTH PARAMS
-    const val SDK_API_KEY: String = "3d9686b635b15b5bc2d19800407609fa"
-    const val PROJECT_ID: String = "Enter your Project Id here"
+    var PROJECT_ID: String = "Enter your Project Id here"
+    const val USER_PROJECT = "USER_PROJECT"
+    const val USER_BASE = "USER_BASE"
 
 //    Prefs constants
     const val SOCKET_CONNECTION = "SOCKET_CONNECTION"
@@ -29,13 +30,15 @@ object ApplicationConstants {
     const val CHUNK_SIZE = 4000// 12kb
 
     //    File paths
-    const val IMAGES_DIRECTORY = "/cPass/images"
-    const val VIDEO_DIRECTORY = "/cPass/videos"
-    const val AUDIO_DIRECTORY = "/cPass/audios"
-    const val DOCS_DIRECTORY = "/cPass/docs"
+    const val IMAGES_DIRECTORY = "/Vdotok-chat/images"
+    const val VIDEO_DIRECTORY = "/Vdotok-chat/videos"
+    const val AUDIO_DIRECTORY = "/Vdotok-chat/audios"
+    const val DOCS_DIRECTORY = "/Vdotok-chat/docs"
 
 //    API ERROR LOG TAGS
     const val API_ERROR = "API_ERROR"
     const val HTTP_CODE_NO_NETWORK = 600
     const val SUCCESS_CODE = 200
+
+    const val type = "chat_file_upload"
 }

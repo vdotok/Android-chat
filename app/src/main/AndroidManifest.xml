@@ -6,9 +6,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
     <application
         android:name="com.vdotok.chat.ChatDemoApp"
@@ -27,6 +29,11 @@
             android:launchMode="singleTask"/>
         <activity android:name="com.vdotok.chat.ui.dashBoard.ui.DashboardActivity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="portrait"
+            tools:replace="android:screenOrientation"
+            android:stateNotNeeded="true"/>
         <activity android:name="com.vdotok.chat.ui.splash.ui.SplashActivity"
             android:theme="@style/Theme.AccountScreen"
             android:screenOrientation="portrait">

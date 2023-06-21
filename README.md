@@ -24,7 +24,7 @@ IDE Installation & Build Guide
 Bravo! You’ve successfully configured the project in Android Studio.
 
 <b>Download Connect Lib:</b>
-* Go to: https://sdk.vdotok.com/Android-SDKs/ and download “<b>connect.aar</b>” file
+* Use the following link to get the latest aar: https://sdk.vdotok.com/Android-SDKs/connect.aar 
 
 <b>Configure Lib:</b>
 * In <b> Android Studio File Explorer</b>, select <b>Project</b>
@@ -37,8 +37,11 @@ Bravo! You’ve successfully configured the project in Android Studio.
 
 <b>Project Signup:</b>
 * Register your account on [VdoTok](https://www.vdotok.com/) to get the <b>Project ID</b> and <b>API Service URL</b>
-* From file explorer, double-click on <b>vdotok-chat -> app -> src -> main -> java -> com -> vdotok -> chat -> utils -> ApplicationConstants</b> replace <b>SDK_PROJECT_ID</b> with your own <b>Project Id</b>
-* From file explorer, double-click on <b>vdotok-chat -> Network -> src -> main -> java -> com ->vdotok -> network -> utils -> Constants</b> replace <b>BASE_URL</b> with your own <b>API Service URL</b>
+* From file explorer, double-click on <b>vdotok-chat -> app -> src -> main -> java -> com -> vdotok -> chat -> utils -> ApplicationConstants</b>, and replace <b>SDK_PROJECT_ID</b> with your own <b>Project Id</b>
+* From file explorer, double-click on <b>vdotok-chat -> Network -> src -> main -> java -> com ->vdotok -> network -> utils -> Constants</b>, and replace <b>BASE_URL</b> with your own <b>API Service URL</b><br>
+<b> OR </b><br>
+You can use the QR code scanner provided on the <b>Login and Signup</b> screens once you have built the application on your device.
+* You can get the QR code by signing in to your Vdotok account at https://console.vdotok.com/apitoken/
 
 <b>Device Setting:</b>
 * To connect a device, enable <b>“developer mode”</b> and <b>“USB debugging”</b> by following the device-specific steps provided [here.](https://developer.android.com/studio/debug/dev-options)

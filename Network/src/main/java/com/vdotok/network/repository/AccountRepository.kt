@@ -1,15 +1,14 @@
 package com.vdotok.network.repository
 
 import com.vdotok.network.models.CheckUserModel
-import com.vdotok.network.network.*
 import com.vdotok.network.models.LoginResponse
 import com.vdotok.network.models.LoginUserModel
 import com.vdotok.network.models.SignUpModel
+import com.vdotok.network.network.Result
 import com.vdotok.network.network.api.ApiService
 import com.vdotok.network.network.safeApiCall
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import retrofit2.Response
 import javax.inject.Inject
 
 class AccountRepository @Inject constructor(

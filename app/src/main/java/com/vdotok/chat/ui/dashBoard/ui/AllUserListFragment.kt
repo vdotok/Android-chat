@@ -1,26 +1,34 @@
 package com.vdotok.chat.ui.dashBoard.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.databinding.ObservableField
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.LayoutAllUserListBinding
 import com.vdotok.chat.dialogs.CreateGroupDialog
 import com.vdotok.chat.extensions.*
+import com.vdotok.chat.models.Data
+import com.vdotok.chat.models.NotificationEvent
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.dashBoard.adapter.AllUserListAdapter
 import com.vdotok.chat.ui.dashBoard.adapter.OnInboxItemClickCallbackListner
 import com.vdotok.chat.ui.dashBoard.viewmodel.AllUserListFragmentViewModel
+import com.vdotok.connect.manager.ChatManager
 import com.vdotok.network.models.*
-import com.vdotok.network.network.*
+import com.vdotok.network.network.NetworkConnectivity
+import com.vdotok.network.network.Result
+import org.json.JSONArray
 
 class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
 
@@ -29,11 +37,13 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
     private val viewModel : AllUserListFragmentViewModel by viewModels()
 
     private lateinit var prefs: Prefs
+    private lateinit var cManger: ChatManager
 
     var title : String? = null
 
     private var edtSearch = ObservableField<String>()
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,7 +61,9 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
 
     private fun init() {
         initUserListAdapter()
-
+        activity?.let {
+            cManger = ChatManager.getInstance(it)
+        }
         binding.search = edtSearch
 
         binding.customToolbar.title.text = getString(R.string.createGroupText)
@@ -149,11 +161,24 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
 
     private fun handleCreateGroupSuccess(response: CreateGroupResponse) {
         activity?.hideKeyboard()
-        response.groupModel?.let {
-            (activity as DashboardActivity).subscribe(it)
-            openChatFragment(response.groupModel)
+        response.let { model ->
+            val dataModel = Data(
+                action = NotificationEvent.NEW.value,
+                groupModel = model
+            )
+            val toList: JSONArray = JSONArray().apply {
+                model.groupModel.participants.forEach {
+                    it.refID?.let { it1 -> this.put(it1) }
+                }
+            }
+            cManger.publishNotification(
+                from = prefs.loginInfo?.refId.toString(),
+                to = toList,
+                data = Gson().toJson(dataModel)
+            )
+            (activity as DashboardActivity).subscribe(model.groupModel)
         }
-
+        openChatFragment(response.groupModel)
     }
 
     /**
@@ -170,6 +195,7 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun getAllUsers() {
         binding.progressBar.toggleVisibility()
         activity?.let { activity ->
@@ -217,8 +243,11 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun populateDataToList(response: GetAllUsersResponseModel) {
-        adapter.updateData(response.users)
+        val list = response.users as ArrayList<UserModel>
+        list.removeIf { it.refID == prefs.loginInfo?.refId }
+        adapter.updateData(list)
     }
 
     override fun onItemClick(position: Int) {

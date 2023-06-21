@@ -12,9 +12,10 @@ interface FragmentRefreshListener {
     fun onPresence(message: ArrayList<Presence>)
     fun onTypingMessage(message: Message)
     fun sendAttachment(msgId: String, fileType: Int)
-    fun recieveAttachment(msgId: String)
+    fun receiveAttachment(msgId: String)
     fun attachmentProgress(msgId: String, progress: Int)
     fun attachmentReceivedFailed()
+    fun attachmentProgressReceive(msgId: String, progress: Int){}
     fun onReceiptReceived(model: ReadReceiptModel)
     fun onBytesArrayReceived(payload: ByteArray?)
     fun onFileReceivedCompleted(headerModel: HeaderModel, byteArray: ByteArray, msgId: String)
@@ -22,4 +23,7 @@ interface FragmentRefreshListener {
     fun onConnectionFailed()
     fun onConnectionLost()
     fun onFileSendingComplete()
+    fun onNotification(notification: String)
+    fun attachmentSendingFailed(headerId:String){}
+    fun downloadFileComplete(){}
 }

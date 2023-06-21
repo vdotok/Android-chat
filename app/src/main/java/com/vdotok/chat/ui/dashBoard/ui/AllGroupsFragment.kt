@@ -1,5 +1,6 @@
 package com.vdotok.chat.ui.dashBoard.ui
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -7,10 +8,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.Navigation
-import com.vdotok.connect.models.*
+import com.google.gson.Gson
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.LayoutFragmentInboxBinding
 import com.vdotok.chat.dialogs.UpdateGroupNameDialog
@@ -18,6 +20,9 @@ import com.vdotok.chat.extensions.hide
 import com.vdotok.chat.extensions.show
 import com.vdotok.chat.extensions.showSnackBar
 import com.vdotok.chat.extensions.toggleVisibility
+import com.vdotok.chat.models.Data
+import com.vdotok.chat.models.NotificationData
+import com.vdotok.chat.models.NotificationEvent
 import com.vdotok.chat.prefs.Prefs
 import com.vdotok.chat.ui.account.ui.AccountActivity.Companion.createAccountsActivity
 import com.vdotok.chat.ui.dashBoard.adapter.AllGroupsListAdapter
@@ -29,10 +34,14 @@ import com.vdotok.chat.utils.ApplicationConstants.LOGIN_INFO
 import com.vdotok.chat.utils.performSingleClick
 import com.vdotok.chat.utils.showDeleteGroupAlert
 import com.vdotok.connect.manager.ChatManager
+import com.vdotok.connect.models.*
 import com.vdotok.network.models.AllGroupsResponse
+import com.vdotok.network.models.CreateGroupResponse
 import com.vdotok.network.models.DeleteGroupModel
 import com.vdotok.network.models.GroupModel
-import com.vdotok.network.network.*
+import com.vdotok.network.network.NetworkConnectivity
+import com.vdotok.network.network.Result
+import org.json.JSONArray
 
 
 /**
@@ -81,12 +90,12 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
             binding.customToolbar.title.text = info.fullName
         }
 
-        messageUpdateLiveData.observe(this.viewLifecycleOwner, { message ->
+        messageUpdateLiveData.observe(this.viewLifecycleOwner) { message ->
 
             adapter.notifyDataSetChanged()
 
             sendAcknowledgeMsgToGroup(message)
-        })
+        }
 
         binding.tvUsername.text = prefs.loginInfo?.fullName
         binding.isSocketConnected = (activity as DashboardActivity).isSocketConnected
@@ -144,7 +153,8 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
-    private fun deleteGroup(model: DeleteGroupModel) {
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun deleteGroup(model: DeleteGroupModel, groupModel: GroupModel) {
         binding.progressBar.toggleVisibility()
 
         activity?.let { activity ->
@@ -156,7 +166,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
                     }
                     is Result.Success ->  {
                         if (it.data.status == ApplicationConstants.SUCCESS_CODE) {
-                            getAllGroups()
+                            handleGroupDelete(it.data)
                             binding.root.showSnackBar(getString(R.string.group_deleted))
                         } else {
                             binding.root.showSnackBar(it.data.message)
@@ -172,6 +182,23 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateGroupData()
+    }
+
+    private fun updateGroupData() {
+        val groupData = (activity as DashboardActivity).groupListData
+        if ((activity as DashboardActivity).groupListData.isEmpty()) {
+            binding.groupChatListing.show()
+            binding.rcvUserList.hide()
+        } else {
+            binding.groupChatListing.hide()
+            binding.rcvUserList.show()
+        }
+        adapter.updateData(groupData)
+    }
+
     private fun addPullToRefresh() {
         binding.swipeRefreshLay.isEnabled = true
         binding.swipeRefreshLay.setOnRefreshListener {
@@ -181,15 +208,41 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun handleGroupDelete(createGroupResponse: CreateGroupResponse) {
+
+        val dataList = (activity as DashboardActivity).groupListData
+        dataList.removeIf { it.id == createGroupResponse.groupModel.id }
+
+        updateGroupData()
+        createGroupResponse.let { model ->
+            val dataModel = Data(
+                action = NotificationEvent.DELETE.value,
+                groupModel = createGroupResponse
+            )
+            val toList: JSONArray = JSONArray().apply {
+                createGroupResponse.groupModel.participants.forEach {
+                    it.refID?.let { it1 -> this.put(it1) }
+                }
+            }
+            cManger.publishNotification(
+                from = prefs.loginInfo?.refId.toString(),
+                to = toList,
+                data = Gson().toJson(dataModel)
+            )
+        }
+    }
+
     private fun handleGroupSuccess(response: AllGroupsResponse) {
         if (response.groups?.isEmpty() == true) {
             binding.groupChatListing.show()
             binding.rcvUserList.hide()
+            (activity as DashboardActivity).groupListData = ArrayList()
         } else {
 
+            (activity as DashboardActivity).groupListData = response.groups as ArrayList<GroupModel>
             dataSet.clear()
             response.groups?.let { dataSet.addAll(it) }
-
             addLastMessageGroupToTop()
 
             binding.groupChatListing.hide()
@@ -311,18 +364,6 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     override fun onNewMessage(message: Message) {
         activity?.runOnUiThread {
             addLastMessageGroupToTop()
-
-            if ((activity as DashboardActivity).mapUnreadCount.containsKey(message.to)) {
-//            val count = (activity as DashboardActivity).mapUnreadCount[message.to]
-//            (activity as DashboardActivity).mapUnreadCount[message.to] = count?.plus(1) ?: 0
-                adapter.notifyDataSetChanged()
-
-            } else {
-//            (activity as DashboardActivity).mapUnreadCount[message.to] = 1
-                adapter.notifyDataSetChanged()
-            }
-//        adapter.notifyDataSetChanged()
-
             sendAcknowledgeMsgToGroup(message)
         }
     }
@@ -344,7 +385,6 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
 
 
     private fun saveAndUpdatePresenceList(presenceList: ArrayList<Presence>) {
-//        prefs.saveUpdatePresenceList(presenceList)
         Log.d("presenceList", presenceList.toString())
         activity?.runOnUiThread {
             adapter.updatePresenceData((activity as DashboardActivity).getPresenceList())
@@ -359,7 +399,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
     override fun sendAttachment(msgId: String, fileType: Int) {
     }
 
-    override fun recieveAttachment(msgId: String) {
+    override fun receiveAttachment(msgId: String) {
 
     }
 
@@ -382,14 +422,17 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
         byteArray: ByteArray,
         msgId: String
     ) {
-        if ((activity as DashboardActivity).mapUnreadCount.containsKey(headerModel.topic)) {
-            val count = (activity as DashboardActivity).mapUnreadCount[headerModel.topic]
-            (activity as DashboardActivity).mapUnreadCount[headerModel.topic] = count?.plus(1) ?: 0
-            adapter.notifyDataSetChanged()
+        activity?.runOnUiThread {
+            if ((activity as DashboardActivity).mapUnreadCount.containsKey(headerModel.topic)) {
+                val count = (activity as DashboardActivity).mapUnreadCount[headerModel.topic]
+                (activity as DashboardActivity).mapUnreadCount[headerModel.topic] =
+                    count?.plus(1) ?: 0
+                adapter.notifyDataSetChanged()
 
-        } else {
-            (activity as DashboardActivity).mapUnreadCount[headerModel.topic] = 1
-            adapter.notifyDataSetChanged()
+            } else {
+                (activity as DashboardActivity).mapUnreadCount[headerModel.topic] = 1
+                adapter.notifyDataSetChanged()
+            }
         }
     }
 
@@ -407,14 +450,48 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
             for (group in dataSet) {
                 cManger.subscribeTopic(group.channelKey, group.channelName)
             }
-        },2000)
+        }, 2000)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun showDeleteGroupDialog(groupId: Int) {
         showDeleteGroupAlert(this.activity) { _, _ ->
             val model = DeleteGroupModel()
             model.groupId = groupId
-            deleteGroup(model)
+            val deletedModel = dataSet.find { groupModel -> groupModel.id == groupId }
+            deletedModel?.let { deleteGroup(model, it) }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    override fun onNotification(notification: String) {
+        activity?.runOnUiThread {
+
+            val dataModel = Gson().fromJson(notification, NotificationData::class.java)
+            val data: ArrayList<GroupModel> = (activity as DashboardActivity).groupListData
+            val groupData = dataModel.data.groupModel
+
+            when(dataModel.data.action) {
+                NotificationEvent.NEW.value -> {
+                    if (data.find { it.id == groupData.groupModel.id} == null) {
+                        data.add(groupData.groupModel)
+                        updateGroupData()
+                        setGroupMapData(data)
+                        dataSet.add(groupData.groupModel)
+                        doSubscribe()
+                    }
+                }
+                NotificationEvent.MODIFY.value -> {
+                    data[data.indexOfFirst { groupModel -> groupModel.id == groupData.groupModel.id }] = groupData.groupModel
+                    (activity as DashboardActivity).groupListData = data
+                    adapter.updateData(data)
+                }
+                NotificationEvent.DELETE.value -> {
+                    (activity as DashboardActivity).groupListData.removeIf { groupModel -> groupModel.id == groupData.groupModel.id}
+                    updateGroupData()
+                }
+                else -> {}
+            }
         }
     }
 
@@ -429,6 +506,7 @@ class AllGroupsFragment : ChatMangerListenerFragment(), InterfaceOnGroupMenuItem
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onDeleteGroup(position: Int) {
         showDeleteGroupDialog(position)
     }

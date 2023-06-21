@@ -10,16 +10,15 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.vdotok.connect.models.Message
-import com.vdotok.connect.models.Presence
 import com.vdotok.chat.R
 import com.vdotok.chat.databinding.ChatRowBinding
 import com.vdotok.chat.extensions.hide
 import com.vdotok.chat.extensions.invisible
 import com.vdotok.chat.extensions.show
 import com.vdotok.chat.prefs.Prefs
+import com.vdotok.connect.models.Message
+import com.vdotok.connect.models.Presence
 import com.vdotok.network.models.GroupModel
-import kotlin.collections.ArrayList
 
 
 class AllGroupsListAdapter(private val context: Context, private val prefs: Prefs, private val username:String, list: List<GroupModel>, private val callback: InterfaceOnGroupMenuItemClick, private val getUnreadCount: (groupModel: GroupModel) -> Int, private val getLastMessge: (groupModel: GroupModel) -> ArrayList<Message>, private val groupItemClick: (groupModel: GroupModel) -> Unit):
