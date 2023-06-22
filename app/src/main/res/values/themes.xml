@@ -8,6 +8,8 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="android:splitMotionEvents">false</item>
+        <item name="android:windowEnableSplitTouch">false</item>
     </style>
 
     <style name="Theme.AccountScreen" parent="Theme.AppCompat.Light.NoActionBar">
