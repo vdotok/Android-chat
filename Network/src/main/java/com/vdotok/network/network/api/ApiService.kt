@@ -48,7 +48,7 @@ interface ApiService {
     suspend fun authSDK(@Body model: AuthenticationRequest): Response<AuthenticationResponse>
 
     @Multipart
-    @POST("/s3upload/")
+    @POST("s3upload/")
     suspend fun uploadImage(
         @Part("type") type: RequestBody,
         @Part file: MultipartBody.Part?,
