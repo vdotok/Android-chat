@@ -55,8 +55,19 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
         init()
         textListenerForSearch()
         getAllUsers()
+        addPullToRefresh()
 
         return binding.root
+    }
+
+    /**
+     * Function for refreshing the updated group
+     * */
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun addPullToRefresh() {
+        binding.swipeRefreshLay.setOnRefreshListener {
+            getAllUsers()
+        }
     }
 
     private fun init() {
@@ -197,6 +208,7 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun getAllUsers() {
+        binding.swipeRefreshLay.isRefreshing = false
         binding.progressBar.toggleVisibility()
         activity?.let { activity ->
             viewModel.getAllUsers("Bearer ${prefs.loginInfo?.authToken}").observe(activity) {
@@ -219,22 +231,22 @@ class AllUserListFragment: Fragment(), OnInboxItemClickCallbackListner {
     }
 
     private fun textListenerForSearch() {
-            binding.searchEditText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
+        binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
 
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
-                override fun afterTextChanged(s: Editable) {
-                   adapter.filter?.filter(s)
-                }
-            })
-        }
+            override fun afterTextChanged(s: Editable) {
+                adapter.filter?.filter(s)
+            }
+        })
+    }
 
     private fun openChatFragment(groupModel: GroupModel?) {
         val bundle = Bundle()

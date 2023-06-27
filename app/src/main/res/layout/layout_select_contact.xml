@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="search"
             type="androidx.databinding.ObservableField&lt;String&gt;" />
@@ -13,20 +15,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
-        android:focusable="true"
-        android:clickable="true">
+        android:clickable="true"
+        android:focusable="true">
 
         <include
             android:id="@+id/custom_toolbar"
-            layout="@layout/custom_toolbar_all_users"/>
+            layout="@layout/custom_toolbar_all_users" />
 
         <EditText
             android:id="@+id/search_edit_text"
+            style="@style/Theme_search_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Theme_search_view"
-            android:text="@={search}"
             android:hint="@string/hint_search_bar"
+            android:text="@={search}"
             android:textAlignment="viewStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -34,62 +36,71 @@
 
         <TextView
             android:id="@+id/tv_groupChat"
+            style="@style/Theme_TextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Theme_TextView"
-            android:textAlignment="viewStart"
             android:layout_gravity="center|start"
-            android:text="@string/add_group_chat"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="46dp"
+            android:layout_marginBottom="16dp"
             android:drawableStart="@drawable/ic_group_chat_icon"
             android:drawablePadding="14dp"
-            android:layout_marginTop="46dp"
-            android:layout_marginStart="14dp"
-            android:layout_marginBottom="16dp"
-            android:textSize="16sp"
+            android:text="@string/add_group_chat"
+            android:textAlignment="viewStart"
             android:textColor="@color/black_green"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="@id/search_edit_text"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_edit_text"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/search_edit_text" />
+
         <View
             android:id="@+id/line1"
             android:layout_width="0dp"
             android:layout_height="0.5dp"
-            android:background="@color/sea_green"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_groupChat"
+            android:background="@color/sea_green"
             app:layout_constraintEnd_toEndOf="@id/search_edit_text"
-            app:layout_constraintStart_toStartOf="@id/search_edit_text"/>
+            app:layout_constraintStart_toStartOf="@id/search_edit_text"
+            app:layout_constraintTop_toBottomOf="@id/tv_groupChat" />
 
         <TextView
             android:id="@+id/tv_selectContact"
+            style="@style/Theme_TextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Theme_TextView"
-            android:textAlignment="viewStart"
             android:layout_gravity="center|start"
-            android:text="@string/contacts"
             android:layout_marginTop="22dp"
             android:layout_marginBottom="24dp"
-            android:textSize="14sp"
+            android:text="@string/contacts"
+            android:textAlignment="viewStart"
             android:textColor="@color/indigo"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@id/search_edit_text"
             app:layout_constraintStart_toStartOf="@id/search_edit_text"
-            app:layout_constraintTop_toBottomOf="@+id/line1"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/line1" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvUserList"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLay"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:orientation="vertical"
             android:layout_marginStart="16dp"
+            android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/search_edit_text"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_selectContact"
-            />
+            tools:itemCount="5">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvUserList"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <View
             android:id="@+id/viewDisableLayout"
@@ -98,7 +109,7 @@
             android:background="@color/grey1"
             android:clickable="true"
             android:focusable="true"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -109,18 +120,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/check"
             style="@style/Theme_TextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:gravity="center"
             android:text="@string/no_user_found"
             android:visibility="gone"
-            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/search_edit_text"
             app:layout_constraintStart_toStartOf="@id/search_edit_text"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_selectContact" />
 
 

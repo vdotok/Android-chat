@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="search"
             type="androidx.databinding.ObservableField&lt;String&gt;" />
@@ -10,59 +12,67 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:focusable="true"
-    android:clickable="true">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:clickable="true"
+        android:focusable="true">
 
-    <include
-        android:id="@+id/custom_toolbar"
-        layout="@layout/custom_toolbar_all_users"/>
+        <include
+            android:id="@+id/custom_toolbar"
+            layout="@layout/custom_toolbar_all_users" />
 
-    <EditText
-        android:id="@+id/search_edit_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        style="@style/Theme_search_view"
-        android:text="@={search}"
-        android:hint="@string/hint_search_bar"
-        android:textAlignment="viewStart"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/custom_toolbar" />
+        <EditText
+            android:id="@+id/search_edit_text"
+            style="@style/Theme_search_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_search_bar"
+            android:text="@={search}"
+            android:textAlignment="viewStart"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/custom_toolbar" />
 
         <TextView
             android:id="@+id/tv_selectContact"
+            style="@style/Theme_TextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/Theme_TextView"
-            android:textAlignment="viewStart"
             android:layout_gravity="center|start"
-            android:text="@string/select_contact"
             android:layout_marginTop="22dp"
             android:layout_marginBottom="25dp"
-            android:textSize="14sp"
+            android:text="@string/select_contact"
+            android:textAlignment="viewStart"
             android:textColor="@color/indigo"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@id/search_edit_text"
             app:layout_constraintStart_toStartOf="@id/search_edit_text"
-            app:layout_constraintTop_toBottomOf="@+id/search_edit_text"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/search_edit_text" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rcvUserList"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="24dp"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_selectContact"
-        />
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="24dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_selectContact"
+            tools:itemCount="5">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvUserList"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -83,12 +93,12 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="24dp"
             android:text="@string/no_user_found"
-            android:visibility="gone"
             android:textAlignment="center"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_selectContact" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

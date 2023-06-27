@@ -1,13 +1,11 @@
 package com.vdotok.chat.ui.dashBoard.ui
 
-import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.databinding.ObservableField
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -42,7 +40,6 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
 
     private var edtSearch = ObservableField<String>()
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,8 +51,18 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
         init()
         textListenerForSearch()
         getAllUsers()
+        addPullToRefresh()
 
         return binding.root
+    }
+
+    /**
+     * Function for refreshing the updated group
+     * */
+    private fun addPullToRefresh() {
+        binding.swipeRefreshLay.setOnRefreshListener {
+            getAllUsers()
+        }
     }
 
     private fun init() {
@@ -65,14 +72,14 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
         }
         binding.search = edtSearch
 
-       binding.customToolbar.title.text = getString(R.string.new_chat)
-       binding.customToolbar.createGroupBtn.hide()
+        binding.customToolbar.title.text = getString(R.string.new_chat)
+        binding.customToolbar.createGroupBtn.hide()
 
-       binding.tvGroupChat.setOnClickListener {
-           activity?.hideKeyboard()
-           openAllUserListFragment()
-           edtSearch.set("")
-       }
+        binding.tvGroupChat.setOnClickListener {
+            activity?.hideKeyboard()
+            openAllUserListFragment()
+            edtSearch.set("")
+        }
 
         binding.customToolbar.imgBack.setOnClickListener {
             activity?.hideKeyboard()
@@ -124,8 +131,8 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun getAllUsers() {
+        binding.swipeRefreshLay.isRefreshing = false
         binding.progressBar.toggleVisibility()
         activity?.let { activity ->
             viewModel.getAllUsers("Bearer ${prefs.loginInfo?.authToken}").observe(activity) {
@@ -228,11 +235,8 @@ class SelectContactFragment: Fragment(), OnChatItemClickCallbackListner {
         })
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
     private fun populateDataToList(response: GetAllUsersResponseModel) {
-        val list = response.users as ArrayList<UserModel>
-        list.removeIf { it.refID == prefs.loginInfo?.refId }
-        adapter.updateData(list)
+        adapter.updateData(response.users)
     }
 
     private fun openAllUserListFragment() {
