@@ -27,6 +27,7 @@ import com.vdotok.network.network.HttpResponseCodes
 import com.vdotok.network.network.NetworkConnectivity
 import com.vdotok.network.network.Result
 import com.vdotok.network.utils.Constants
+import com.vdotok.network.utils.Constants.BASE_URL
 
 
 /**
@@ -115,7 +116,7 @@ class LoginFragment : Fragment() {
     private fun loginV2() {
         binding.signInBtn.disable()
         activity?.let { activity ->
-            if (PROJECT_ID.isNotEmpty() && Constants.BASE_URL.isNotEmpty()) {
+            if (PROJECT_ID.isNotEmpty() && (BASE_URL.isNotEmpty() && BASE_URL.contains("http"))) {
                 viewModel.loginUser(PROJECT_ID).observe(activity) {
                     binding.signInBtn.enable()
                     when (it) {

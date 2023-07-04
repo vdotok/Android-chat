@@ -85,7 +85,7 @@ class SignUpFragment : Fragment() {
 
     private fun checkUserEmail(email: String) {
         activity?.let { activity ->
-            if (PROJECT_ID.isNotEmpty() && BASE_URL.isNotEmpty()) {
+            if (PROJECT_ID.isNotEmpty() && (BASE_URL.isNotEmpty() && BASE_URL.contains("http"))) {
                 viewModel.checkEmailExist(email).observe(viewLifecycleOwner) {
                     binding.btnSignUp.enable()
                     when (it) {
@@ -138,7 +138,7 @@ class SignUpFragment : Fragment() {
 
     private fun signUp() {
         binding.btnSignUp.disable()
-        if (PROJECT_ID.isNotEmpty() && BASE_URL.isNotEmpty()) {
+        if (PROJECT_ID.isNotEmpty() && (BASE_URL.isNotEmpty() && BASE_URL.contains("http"))) {
             activity?.let { activity ->
                 viewModel.signUp(
                     SignUpModel(
